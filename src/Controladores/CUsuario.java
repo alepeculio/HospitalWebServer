@@ -29,11 +29,10 @@ public class CUsuario {
                     .setParameter("u", ci)
                     .setParameter("c", contrasenia)
                     .getSingleResult();
-
-            em.getTransaction().commit();
         } catch (Exception e) {
             System.out.println("No se encontró el usuario");
         }
+        em.getTransaction().commit();
         return u;
     }
 }
