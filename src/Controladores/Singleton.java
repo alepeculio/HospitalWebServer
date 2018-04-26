@@ -47,6 +47,18 @@ public class Singleton {
             em.getTransaction().rollback();
         }
     }
+    
+    public void remove(Object object) {
+        EntityManager em = getEntity();
+        em.getTransaction().begin();
+        try {
+            em.remove(object);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            em.getTransaction().rollback();
+        }
+    }
 
     public void refresh(Object object) {
         EntityManager em = getEntity();
