@@ -7,6 +7,7 @@ package Clases;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -43,7 +44,8 @@ public class Hospital implements Serializable {
     public void setSuscripciones(List<Suscripcion> suscripciones) {
         this.suscripciones = suscripciones;
     }
-   
+    
+    @Column(unique = true)
     private String nombre;
     private boolean publico;
     private String departamento;
