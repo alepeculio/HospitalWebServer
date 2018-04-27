@@ -34,6 +34,24 @@ public class Turno implements Serializable {
     private int numero;
     private boolean finalizado;
 
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public HorarioAtencion getHorarioAtencion() {
+        return horarioAtencion;
+    }
+
+    public void setHorarioAtencion(HorarioAtencion horarioAtencion) {
+        this.horarioAtencion = horarioAtencion;
+    }
+
+    
+    
     public TipoTurno getTipo() {
         return tipo;
     }

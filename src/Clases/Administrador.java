@@ -14,7 +14,7 @@ import javax.persistence.OneToOne;
 
 /**
  *
- * @author Jorge
+ * @author Ale
  */
 @Entity
 public class Administrador implements Serializable {
@@ -28,14 +28,6 @@ public class Administrador implements Serializable {
     private Usuario usuario;
     @OneToOne
     private Hospital hospital;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public boolean isAdminGeneral() {
         return adminGeneral;
@@ -60,7 +52,15 @@ public class Administrador implements Serializable {
     public void setHospital(Hospital hospital) {
         this.hospital = hospital;
     }
-    
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -83,7 +83,7 @@ public class Administrador implements Serializable {
 
     @Override
     public String toString() {
-        return "Logica.Administrador[ id=" + id + " ]";
+        return "Clases.Administrador[ id=" + id + " ]";
     }
-    
+
 }

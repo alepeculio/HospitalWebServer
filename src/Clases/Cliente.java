@@ -27,7 +27,7 @@ public class Cliente implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int ci;
+    private long id;
     private String nombre;
     private String apellido;
     private String[] telefonos;
@@ -49,6 +49,15 @@ public class Cliente implements Serializable {
     @OneToMany(mappedBy = "cliente")
     List<Suscripcion> suscripciones;
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    
     public List<Suscripcion> getSuscripciones() {
         return suscripciones;
     }
@@ -71,14 +80,6 @@ public class Cliente implements Serializable {
 
     public void setTurnos(List<Turno> turnos) {
         this.turnos = turnos;
-    }
-
-    public int getCi() {
-        return ci;
-    }
-
-    public void setCi(int ci) {
-        this.ci = ci;
     }
 
     public String getNombre() {
@@ -180,7 +181,7 @@ public class Cliente implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (int) ci;
+        hash += (int) id;
         return hash;
     }
 
@@ -191,7 +192,7 @@ public class Cliente implements Serializable {
             return false;
         }
         Cliente other = (Cliente) object;
-        if (this.ci != other.ci) {
+        if (this.id != other.id) {
             return false;
         }
         return true;
@@ -199,7 +200,7 @@ public class Cliente implements Serializable {
 
     @Override
     public String toString() {
-        return "Logica.Cliente[ id=" + ci + " ]";
+        return "Logica.Cliente[ id=" + id + " ]";
     }
 
 }

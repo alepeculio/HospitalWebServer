@@ -20,16 +20,26 @@ public class Usuario implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    private String usuario;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String ci;
     private String contrasenia;
     private String correo;
 
-    public String getUsuario() {
-        return usuario;
+    public long getId() {
+        return id;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getCi() {
+        return ci;
+    }
+
+    public void setCi(String ci) {
+        this.ci = ci;
     }
 
     public String getContrasenia() {
@@ -51,7 +61,7 @@ public class Usuario implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (usuario != null ? usuario.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -62,7 +72,7 @@ public class Usuario implements Serializable {
             return false;
         }
         Usuario other = (Usuario) object;
-        if ((this.usuario == null && other.usuario != null) || (this.usuario != null && !this.usuario.equals(other.usuario))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -70,7 +80,7 @@ public class Usuario implements Serializable {
 
     @Override
     public String toString() {
-        return "Logica.Usuario[ id=" + usuario + " ]";
+        return "Logica.Usuario[ id=" + id + " ]";
     }
-    
+
 }

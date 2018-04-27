@@ -15,25 +15,26 @@ public class Singleton {
     private static Singleton INSTANCE;
     private static EntityManagerFactory EMF;
     private static EntityManager EM;
-        
-    private Singleton () {
-        EMF = Persistence.createEntityManagerFactory ("HospitalWebServerPU");
-        EM = EMF.createEntityManager ();
+
+    private Singleton() {
+        EMF = Persistence.createEntityManagerFactory("HospitalWebServerPU");
+        EM = EMF.createEntityManager();
     }
 
-    public static Singleton getInstance () {
-        if (INSTANCE == null)
-            INSTANCE = new Singleton ();
-        
+    public static Singleton getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Singleton();
+        }
+
         return INSTANCE;
     }
 
-    public EntityManager getEntity () {
+    public EntityManager getEntity() {
         return EM;
     }
 
-    public void cerrarSesion () {
-        EM.close ();
+    public void cerrarSesion() {
+        EM.close();
     }
 
     public void persist(Object object) {
@@ -47,7 +48,7 @@ public class Singleton {
             em.getTransaction().rollback();
         }
     }
-    
+
     public void remove(Object object) {
         EntityManager em = getEntity();
         em.getTransaction().begin();
