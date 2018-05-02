@@ -14,6 +14,18 @@ import java.util.List;
  */
 public class CHospital {
     
+    public static void modificarHospital (String nombre, Hospital h) {
+        Hospital viejo = obtenerHospital (nombre);
+        viejo.setNombre (h.getNombre ());
+        viejo.setPublico (h.isPublico ());
+        viejo.setDepartamento (h.getDepartamento ());
+        viejo.setCalle (h.getCalle ());
+        viejo.setNumero (h.getNumero ());
+        viejo.setLatitud (h.getLatitud ());
+        viejo.setLongitud (h.getLongitud ());
+        Singleton.getInstance ().merge (viejo);
+    }
+    
     public static void borrarHospital (String nombre) {
         Hospital h = obtenerHospital (nombre);
         
