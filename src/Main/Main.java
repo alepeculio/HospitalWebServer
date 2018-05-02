@@ -20,7 +20,7 @@ public class Main {
 
     public static void main(String[] args) {
         Singleton s = Singleton.getInstance();
-
+/*
         Usuario u = new Usuario();
         u.setCi("51117521");
         u.setContrasenia("1");
@@ -118,7 +118,7 @@ public class Main {
         s.persist(cli);
         s.refresh(cli);
 
-        //termina la magia
+        //termina la magia */
         System.out.println("Servidor Corriendo...");
 
         System.exit(0);
