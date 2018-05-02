@@ -9,7 +9,9 @@ import Clases.Cliente;
 import Clases.Empleado;
 import Clases.HorarioAtencion;
 import Clases.Suscripcion;
+import Clases.Turno;
 import Clases.Usuario;
+import Clases.Vacunacion;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -83,5 +85,70 @@ public class CUsuario {
         }
 
         return empleado;
+    }
+
+    public Cliente getCliente(long id) {
+        EntityManager em = s.getEntity();
+
+        Cliente cliente = null;
+        em.getTransaction().begin();
+        try {
+            cliente = (Cliente) em.createNativeQuery("SELECT * FROM cliente WHERE usuario_id=" + id, Cliente.class)
+                    .getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            System.err.println("No se puedo encontrar el empleado relacionado al usuario con id: " + id);
+        }
+
+        if (cliente != null) {
+
+            List<Cliente> hijos = null;
+            em.getTransaction().begin();
+            try {
+                hijos = (List<Cliente>) em.createNativeQuery("SELECT * FROM cliente_cliente WHERE cliente_id=" + cliente.getId(), Cliente.class)
+                        .getResultList();
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+            }
+            cliente.setHijos(hijos);
+//
+            List<Suscripcion> s = null;
+            em.getTransaction().begin();
+            try {
+                s = (List<Suscripcion>) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id=" + cliente.getId(), Suscripcion.class)
+                        .getResultList();
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+            }
+            cliente.setSuscripciones(s);
+
+            List<Vacunacion> vacunas = null;
+            em.getTransaction().begin();
+            try {
+                vacunas = (List<Vacunacion>) em.createNativeQuery("SELECT * FROM cliente_vacunacion WHERE cliente_id=" + cliente.getId(), Vacunacion.class)
+                        .getResultList();
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+            }
+            cliente.setVacunacion(vacunas);
+
+            List<Turno> turnos = null;
+            em.getTransaction().begin();
+            try {
+                turnos = (List<Turno>) em.createNativeQuery("SELECT * FROM turno WHERE cliente_id=" + cliente.getId(), Turno.class)
+                        .getResultList();
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+            }
+            cliente.setTurnos(turnos);
+
+        }
+
+        return cliente;
     }
 }

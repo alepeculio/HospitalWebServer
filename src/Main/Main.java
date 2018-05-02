@@ -3,9 +3,11 @@ package Main;
 import Clases.Cliente;
 import Clases.Empleado;
 import Clases.HorarioAtencion;
+import Clases.Suscripcion;
 import Clases.TipoTurno;
 import Clases.Turno;
 import Clases.Usuario;
+import Clases.Vacunacion;
 import Controladores.Singleton;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,22 +72,53 @@ public class Main {
 
         s.merge(e);
         s.merge(ha);
-        
+
         Turno t = new Turno();
         t.setFinalizado(false);
         t.setNumero(1);
         t.setTipo(TipoTurno.ATENCION);
         t.setHorarioAtencion(ha);
-        
+
         s.persist(t);
         s.refresh(t);
-        
+
         List<Turno> ts = new ArrayList<>();
         ts.add(t);
         ha.setTurnos(ts);
-        
+
         s.merge(ha);
 
+        //magia
+        Usuario usr = new Usuario();
+
+        usr.setCi("51396218");
+        usr.setContrasenia("1");
+        usr.setCorreo("etchebarneluis@gmail.com");
+
+        s.persist(usr);
+        s.refresh(usr);
+
+        Cliente cli = new Cliente();
+        cli.setUsuario(usr);
+        cli.setNombre("Luis");
+        cli.setMesNacimiento(1);
+        cli.setAnioNacimiento(1998);
+        cli.setDiaNacimiento(17);
+        cli.setNumero(46);
+        cli.setHijos(new ArrayList<Cliente>());
+        cli.setPiso(0);
+        cli.setApartamento(0);
+        cli.setApellido("Etchebarne");
+        cli.setCalle("Saravia");
+        cli.setVacunacion(new ArrayList<Vacunacion>());
+        cli.setSuscripciones(new ArrayList<Suscripcion>());
+        String[] tel = {"091206680", "45320329"};
+        cli.setTelefonos(tel);
+
+        s.persist(cli);
+        s.refresh(cli);
+
+        //termina la magia
         System.out.println("Servidor Corriendo...");
 
         System.exit(0);
