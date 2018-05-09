@@ -12,7 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-
 /**
  *
  * @author Brian
@@ -50,8 +49,6 @@ public class Turno implements Serializable {
         this.horarioAtencion = horarioAtencion;
     }
 
-    
-    
     public TipoTurno getTipo() {
         return tipo;
     }
@@ -75,7 +72,7 @@ public class Turno implements Serializable {
     public void setFinalizado(boolean finalizado) {
         this.finalizado = finalizado;
     }
-    
+
     public long getId() {
         return id;
     }
@@ -108,5 +105,5 @@ public class Turno implements Serializable {
     public String toString() {
         return "Logica.Turno[ id=" + id + " ]";
     }
-    
+
 }

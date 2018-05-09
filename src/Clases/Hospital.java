@@ -15,6 +15,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -44,6 +45,17 @@ public class Hospital implements Serializable {
     private List<Administrador> administradores;
     @OneToMany(mappedBy = "hospital")
     private List<HorarioAtencion> horarioAtencions;
+
+    public List<Empleado> getEmpleados() {
+        return empleados;
+    }
+
+    public void setEmpleados(List<Empleado> empleados) {
+        this.empleados = empleados;
+    }
+    
+    @ManyToMany
+    private List<Empleado> empleados;
 
     public List<HorarioAtencion> getHorarioAtencions() {
         return horarioAtencions;

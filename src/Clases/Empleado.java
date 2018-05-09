@@ -8,6 +8,7 @@ package Clases;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 /**
@@ -17,6 +18,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class Empleado extends Cliente implements Serializable {
 
+    @ManyToMany(mappedBy = "empleado")
+    private List<Hospital> hospitals;
     private String[] especialidades;
     private String[] titulos;
     private String tipo;
@@ -54,6 +57,5 @@ public class Empleado extends Cliente implements Serializable {
     public void setHorariosAtencions(List<HorarioAtencion> horariosAtencions) {
         this.horariosAtencions = horariosAtencions;
     }
-    
-    
+
 }

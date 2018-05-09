@@ -6,6 +6,7 @@
 package Controladores;
 
 import Clases.Administrador;
+import Clases.Empleado;
 import Clases.Hospital;
 import Clases.Usuario;
 import java.util.ArrayList;
@@ -16,91 +17,109 @@ import java.util.List;
  * @author Jorge
  */
 public class CHospital {
-    
-    public static void borrarAdministrador (String nomHospital, String ciAdmin) {
-        Hospital h = obtenerHospital (nomHospital);
-        h.removerAdministrador (ciAdmin);
-        Singleton.getInstance ().merge (h);
+
+    public static void borrarAdministrador(String nomHospital, String ciAdmin) {
+        Hospital h = obtenerHospital(nomHospital);
+        h.removerAdministrador(ciAdmin);
+        Singleton.getInstance().merge(h);
     }
-    
-    public static void modificarAdministrador (String nomHospital, Usuario u) {
-        List<Administrador> administradores = obtenerHospital (nomHospital).getAdministradores ();
-        
-        for (Administrador a : administradores)
-            if (a.getUsuario ().getCi ().equals (u.getCi ())) {
-                a.setUsuario (u);
-                Singleton.getInstance ().merge (a);
+
+    public static void modificarAdministrador(String nomHospital, Usuario u) {
+        List<Administrador> administradores = obtenerHospital(nomHospital).getAdministradores();
+
+        for (Administrador a : administradores) {
+            if (a.getUsuario().getCi().equals(u.getCi())) {
+                a.setUsuario(u);
+                Singleton.getInstance().merge(a);
             }
+        }
     }
-    
-    public static List<Usuario> obtenerAdministradoresHospital (String nomHospital) {
-        List<Administrador> administradores = obtenerHospital (nomHospital).getAdministradores ();
-        
-        if (administradores == null)
+
+    public static List<Usuario> obtenerAdministradoresHospital(String nomHospital) {
+        List<Administrador> administradores = obtenerHospital(nomHospital).getAdministradores();
+
+        if (administradores == null) {
             return null;
-        
-        List<Usuario> usuarios = new ArrayList<> ();
-        
-        for (Administrador a : administradores)
-            usuarios.add (a.getUsuario ());
-        
-        return usuarios.size () == 0 ? null : usuarios;
+        }
+
+        List<Usuario> usuarios = new ArrayList<>();
+
+        for (Administrador a : administradores) {
+            usuarios.add(a.getUsuario());
+        }
+
+        return usuarios.size() == 0 ? null : usuarios;
     }
-    
-    public static String agregarAdministrador (String nomHospital, Usuario u) {
-        Hospital h = obtenerHospital (nomHospital);
-        List<Administrador> admins = h.getAdministradores ();
-        
-        if (admins != null)
-            for (Administrador a : admins)
-                if (a.getUsuario ().getCi ().equals (u.getCi ()))
+
+    public static String agregarAdministrador(String nomHospital, Usuario u) {
+        Hospital h = obtenerHospital(nomHospital);
+        List<Administrador> admins = h.getAdministradores();
+
+        if (admins != null) {
+            for (Administrador a : admins) {
+                if (a.getUsuario().getCi().equals(u.getCi())) {
                     return "C.I. ya existe";
-                else if (a.getUsuario ().getCorreo ().equals (u.getCorreo ()))
+                } else if (a.getUsuario().getCorreo().equals(u.getCorreo())) {
                     return "Correo ya existe";
-        
-        h.agregarAdministrador (u);
-        Singleton.getInstance ().merge (h);
+                }
+            }
+        }
+
+        h.agregarAdministrador(u);
+        Singleton.getInstance().merge(h);
         return "";
     }
-    
-    public static void modificarHospital (String nombre, Hospital h) {
-        Hospital viejo = obtenerHospital (nombre);
-        viejo.setNombre (h.getNombre ());
-        viejo.setPublico (h.isPublico ());
-        viejo.setDepartamento (h.getDepartamento ());
-        viejo.setCalle (h.getCalle ());
-        viejo.setNumero (h.getNumero ());
-        viejo.setLatitud (h.getLatitud ());
-        viejo.setLongitud (h.getLongitud ());
-        Singleton.getInstance ().merge (viejo);
+
+    public static void modificarHospital(String nombre, Hospital h) {
+        Hospital viejo = obtenerHospital(nombre);
+        viejo.setNombre(h.getNombre());
+        viejo.setPublico(h.isPublico());
+        viejo.setDepartamento(h.getDepartamento());
+        viejo.setCalle(h.getCalle());
+        viejo.setNumero(h.getNumero());
+        viejo.setLatitud(h.getLatitud());
+        viejo.setLongitud(h.getLongitud());
+        Singleton.getInstance().merge(viejo);
     }
-    
-    public static void borrarHospital (String nombre) {
-        Hospital h = obtenerHospital (nombre);
-        
-        if (h != null)
-            Singleton.getInstance ().remove (h);
+
+    public static void borrarHospital(String nombre) {
+        Hospital h = obtenerHospital(nombre);
+
+        if (h != null) {
+            Singleton.getInstance().remove(h);
+        }
     }
-    
-    public static Hospital obtenerHospital (String nombre) {
-        List<Hospital> hospitales = obtenerHospitales ();
-        
-        for (Hospital h : hospitales)
-            if (h.getNombre ().equals (nombre))
+
+    public static Hospital obtenerHospital(String nombre) {
+        List<Hospital> hospitales = obtenerHospitales();
+
+        for (Hospital h : hospitales) {
+            if (h.getNombre().equals(nombre)) {
                 return h;
-        
+            }
+        }
+
         return null;
     }
-    
-    public static List<Hospital> obtenerHospitales () {
+
+    public static List<Hospital> obtenerHospitales() {
         List<Hospital> lista = null;
         Singleton.getInstance().getEntity().getTransaction().begin();
         try {
-            lista = Singleton.getInstance().getEntity().createNativeQuery ("SELECT * FROM hospital", Hospital.class).getResultList ();
+            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM hospital", Hospital.class).getResultList();
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
             Singleton.getInstance().getEntity().getTransaction().rollback();
         }
         return lista;
     }
+
+
+    public static List<Empleado> obtenerEmpleados(String nombreH) {
+
+        List<Empleado> empleados = obtenerHospital(nombreH).getEmpleados();
+        return empleados;
+
+    }
+
 }

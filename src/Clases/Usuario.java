@@ -83,4 +83,8 @@ public class Usuario implements Serializable {
         return "Logica.Usuario[ id=" + id + " ]";
     }
 
+    public Object getUsuario() {
+      return this;
+    }
+
 }

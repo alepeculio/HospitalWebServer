@@ -21,7 +21,7 @@ import javax.persistence.OneToOne;
  * @author Jorge
  */
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Cliente implements Serializable {
 
     private static final long serialVersionUID = 1L;
