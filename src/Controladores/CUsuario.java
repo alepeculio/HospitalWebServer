@@ -6,6 +6,7 @@
 package Controladores;
 
 import Clases.Administrador;
+import Clases.Cliente;
 import Clases.Empleado;
 import Clases.HorarioAtencion;
 import Clases.Suscripcion;
