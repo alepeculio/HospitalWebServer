@@ -5,14 +5,18 @@
  */
 package Clases;
 
+import Controladores.Singleton;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -20,18 +24,61 @@ import javax.persistence.OneToMany;
  */
 @Entity
 public class Hospital implements Serializable {
-
-    @OneToMany(mappedBy = "hospital")
-    private List<HorarioAtencion> horarioAtencions;
-
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    
+    @Column(unique = true)
+    private String nombre;
+    private boolean publico;
+    private String departamento;
+    private String calle;
+    private int numero;
+    private double latitud;
+    private double longitud;
+    @OneToMany(mappedBy = "hospital")
+    private List<Suscripcion> suscripciones;
+    @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Administrador> administradores;
+    @OneToMany(mappedBy = "hospital")
+    private List<HorarioAtencion> horarioAtencions;
 
     public List<HorarioAtencion> getHorarioAtencions() {
         return horarioAtencions;
     }
+
+    public List<Administrador> getAdministradores () {
+        return administradores;
+    }
+
+    public void setAdministradores (List<Administrador> administradores) {
+        this.administradores = administradores;
+    }
+    
+    public void agregarAdministrador (Usuario u) {
+        if (administradores == null)
+            administradores = new ArrayList<>();
+        
+        Administrador a = new Administrador ();
+        a.setAdminGeneral (false);
+        a.setUsuario (u);
+        a.setHospital (this);
+        administradores.add (a);
+    }
+    
+    public void removerAdministrador (String ciAdmin) {
+        if (administradores == null)
+            return;
+        
+        for (int i = 0; i < administradores.size (); i++)
+            if (administradores.get (i).getUsuario ().getCi ().equals (ciAdmin)) {
+                administradores.remove (i);
+                return;
+            }
+    }
+    
 
     public void setHorarioAtencions(List<HorarioAtencion> horarioAtencions) {
         this.horarioAtencions = horarioAtencions;
@@ -44,17 +91,6 @@ public class Hospital implements Serializable {
     public void setSuscripciones(List<Suscripcion> suscripciones) {
         this.suscripciones = suscripciones;
     }
-    
-    @Column(unique = true)
-    private String nombre;
-    private boolean publico;
-    private String departamento;
-    private String calle;
-    private int numero;
-    private double latitud;
-    private double longitud;
-    @OneToMany(mappedBy = "hospital")
-    private List<Suscripcion> suscripciones;
 
     public boolean isPublico() {
         return publico;

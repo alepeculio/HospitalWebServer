@@ -45,7 +45,8 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive ())
+                em.getTransaction().rollback();
         }
     }
 
@@ -57,7 +58,8 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive ())
+                em.getTransaction().rollback();
         }
     }
 
@@ -69,7 +71,8 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive ())
+                em.getTransaction().rollback();
         }
     }
 
@@ -81,7 +84,8 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive ())
+                em.getTransaction().rollback();
         }
     }
 }
