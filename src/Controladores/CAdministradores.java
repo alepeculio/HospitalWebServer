@@ -6,6 +6,7 @@
 package Controladores;
 
 import Clases.Administrador;
+import Clases.Usuario;
 import java.util.List;
 
 /**
@@ -24,5 +25,12 @@ public class CAdministradores {
             Singleton.getInstance().getEntity().getTransaction().rollback();
         }
         return lista;
+    }
+    
+    public static void agregarAdminGeneral (Usuario u) {
+        Administrador a = new Administrador ();
+        a.setAdminGeneral (true);
+        a.setUsuario (u);
+        Singleton.getInstance ().persist (a);
     }
 }
