@@ -5,16 +5,13 @@
  */
 package Controladores;
 
-import Clases.Cliente;
+import Clases.Administrador;
 import Clases.Empleado;
 import Clases.HorarioAtencion;
 import Clases.Suscripcion;
 import Clases.Usuario;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
 
 /**
  *
@@ -23,11 +20,27 @@ import javax.persistence.Persistence;
 public class CUsuario {
 
     Singleton s = Singleton.getInstance();
+    
+    public static String obtenerTipo (Usuario u) {
+        List<Administrador> admins = CAdministradores.obtenerAdministradores ();
+        
+        if (admins != null)
+            for (Administrador a : admins)
+                if (a.getUsuario ().getCi ().equals (u.getCi ())) {
+                    if (a.isAdminGeneral ())
+                        return "General";
+                    else
+                        return "Hospital";
+                }
+        
+        return "Cliente";
+    }
 
     public Usuario login(String ci, String contrasenia) {
         EntityManager em = s.getEntity();
         em.getTransaction().begin();
         Usuario u = null;
+        
         try {
             u = (Usuario) em.createQuery("SELECT u FROM Usuario u WHERE ci= :cedula AND contrasenia= :pass", Usuario.class)
                     .setParameter("cedula", ci)
