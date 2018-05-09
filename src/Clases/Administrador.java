@@ -6,10 +6,12 @@
 package Clases;
 
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 /**
@@ -24,9 +26,10 @@ public class Administrador implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private boolean adminGeneral;
-    @OneToOne
+    @OneToOne (cascade = CascadeType.ALL)
     private Usuario usuario;
     @OneToOne
+    @ManyToOne
     private Hospital hospital;
 
     public boolean isAdminGeneral() {

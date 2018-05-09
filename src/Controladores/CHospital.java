@@ -5,7 +5,10 @@
  */
 package Controladores;
 
+import Clases.Administrador;
 import Clases.Hospital;
+import Clases.Usuario;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,6 +16,52 @@ import java.util.List;
  * @author Jorge
  */
 public class CHospital {
+    
+    public static void borrarAdministrador (String nomHospital, String ciAdmin) {
+        Hospital h = obtenerHospital (nomHospital);
+        h.removerAdministrador (ciAdmin);
+        Singleton.getInstance ().merge (h);
+    }
+    
+    public static void modificarAdministrador (String nomHospital, Usuario u) {
+        List<Administrador> administradores = obtenerHospital (nomHospital).getAdministradores ();
+        
+        for (Administrador a : administradores)
+            if (a.getUsuario ().getCi ().equals (u.getCi ())) {
+                a.setUsuario (u);
+                Singleton.getInstance ().merge (a);
+            }
+    }
+    
+    public static List<Usuario> obtenerAdministradoresHospital (String nomHospital) {
+        List<Administrador> administradores = obtenerHospital (nomHospital).getAdministradores ();
+        
+        if (administradores == null)
+            return null;
+        
+        List<Usuario> usuarios = new ArrayList<> ();
+        
+        for (Administrador a : administradores)
+            usuarios.add (a.getUsuario ());
+        
+        return usuarios.size () == 0 ? null : usuarios;
+    }
+    
+    public static String agregarAdministrador (String nomHospital, Usuario u) {
+        Hospital h = obtenerHospital (nomHospital);
+        List<Administrador> admins = h.getAdministradores ();
+        
+        if (admins != null)
+            for (Administrador a : admins)
+                if (a.getUsuario ().getCi ().equals (u.getCi ()))
+                    return "C.I. ya existe";
+                else if (a.getUsuario ().getCorreo ().equals (u.getCorreo ()))
+                    return "Correo ya existe";
+        
+        h.agregarAdministrador (u);
+        Singleton.getInstance ().merge (h);
+        return "";
+    }
     
     public static void modificarHospital (String nombre, Hospital h) {
         Hospital viejo = obtenerHospital (nombre);
