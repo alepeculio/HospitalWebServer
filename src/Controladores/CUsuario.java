@@ -97,4 +97,8 @@ public class CUsuario {
 
         return empleado;
     }
+
+    public boolean altaCliente(Cliente cliente) {
+        return  s.persist(cliente);
+    }
 }
