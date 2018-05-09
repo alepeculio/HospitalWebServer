@@ -7,6 +7,7 @@ package Clases;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,6 +33,8 @@ public class Cliente implements Serializable {
     private String apellido;
     private String[] telefonos;
     private String calle;
+    private String departamento;
+    private String ciudad;
     private int numero;
     private int piso;
     private int apartamento;
@@ -40,7 +43,7 @@ public class Cliente implements Serializable {
     private int anioNacimiento;
     @OneToMany
     private List<Cliente> hijos;
-    @OneToOne
+    @OneToOne (cascade = CascadeType.ALL)
     private Usuario usuario;
     @OneToMany
     private List<Vacunacion> vacunacion;
@@ -57,7 +60,22 @@ public class Cliente implements Serializable {
         this.id = id;
     }
 
-    
+    public String getDepartamento() {
+        return departamento;
+    }
+
+    public void setDepartamento(String departamento) {
+        this.departamento = departamento;
+    }
+
+    public String getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
+    }
+
     public List<Suscripcion> getSuscripciones() {
         return suscripciones;
     }
