@@ -18,8 +18,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class Empleado extends Cliente implements Serializable {
 
-    @ManyToMany(mappedBy = "empleado")
-    private List<Hospital> hospitals;
+    @ManyToMany(mappedBy = "empleados")
+    private List<Hospital> hospitals;    
     private String[] especialidades;
     private String[] titulos;
     private String tipo;

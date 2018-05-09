@@ -5,41 +5,32 @@
  */
 package Controladores;
 
-import Clases.Cliente;
+import Clases.Administrador;
+import Clases.Usuario;
 import java.util.List;
 
 /**
  *
  * @author Jorge
  */
-public class CCliente {
-
-    public static List<Cliente> obtenerClientes() {
-        List<Cliente> lista = null;
+public class CAdministradores {
+    
+    public static List<Administrador> obtenerAdministradores () {
+        List<Administrador> lista = null;
         Singleton.getInstance().getEntity().getTransaction().begin();
         try {
-            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente", Cliente.class).getResultList();
+            lista = Singleton.getInstance().getEntity().createNativeQuery ("SELECT * FROM administrador", Administrador.class).getResultList ();
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
             Singleton.getInstance().getEntity().getTransaction().rollback();
         }
         return lista;
     }
-
-    public static void RegistrarHijoPlanVacunacion(Cliente padre, Cliente hijo) {
-
+    
+    public static void agregarAdminGeneral (Usuario u) {
+        Administrador a = new Administrador ();
+        a.setAdminGeneral (true);
+        a.setUsuario (u);
+        Singleton.getInstance ().persist (a);
     }
-
-    public static void ReservarTurnoVacunacion() {
-
-    }
-
-    public static void ModificarTurnoVacunacion(String[] args) {
-
-    }
-
-    public static void CancelarTurnoVacunacion(String[] args) {
-
-    }
-
 }
