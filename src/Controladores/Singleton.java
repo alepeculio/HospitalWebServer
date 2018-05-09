@@ -37,15 +37,17 @@ public class Singleton {
         EM.close();
     }
 
-    public void persist(Object object) {
+    public boolean persist(Object object) {
         EntityManager em = getEntity();
         em.getTransaction().begin();
         try {
             em.persist(object);
             em.getTransaction().commit();
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
             em.getTransaction().rollback();
+            return false;
         }
     }
 
