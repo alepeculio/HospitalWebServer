@@ -66,7 +66,10 @@ public class CHospital {
     public static void modificarHospital (String nombre, Hospital h) {
         Hospital viejo = obtenerHospital (nombre);
         viejo.setNombre (h.getNombre ());
+        viejo.setDirectora (h.getDirectora ());
         viejo.setPublico (h.isPublico ());
+        viejo.setCorreo (h.getCorreo ());
+        viejo.setTelefono (h.getTelefono ());
         viejo.setDepartamento (h.getDepartamento ());
         viejo.setCalle (h.getCalle ());
         viejo.setNumero (h.getNumero ());
