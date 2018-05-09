@@ -1,8 +1,10 @@
 package Main;
 
+import Clases.Administrador;
 import Clases.Cliente;
 import Clases.Empleado;
 import Clases.HorarioAtencion;
+import Clases.Hospital;
 import Clases.Suscripcion;
 import Clases.TipoTurno;
 import Clases.Turno;
@@ -20,14 +22,22 @@ public class Main {
 
     public static void main(String[] args) {
         Singleton s = Singleton.getInstance();
-/*
+        /*
+        Hospital h = new Hospital();
+        h.setNombre("innova");
+        h.setLatitud(-32.318557);
+        h.setLongitud(-58.084878);
+        h.setPublico(true);
+        h.setSuscripciones(null);
+        s.persist(h); */
+ /*        
         Usuario u = new Usuario();
         u.setCi("51117521");
         u.setContrasenia("1");
         u.setCorreo("alejandropeculio@gmail.com");
 
         s.persist(u);
-        s.refresh(u);
+        s.refresh(u); 
 
         System.out.println("ID usuario: " + u.getId());
 
@@ -86,19 +96,22 @@ public class Main {
         ts.add(t);
         ha.setTurnos(ts);
 
-        s.merge(ha);
-
-        //magia
+        s.merge(ha); */ //magia
+        /*        
         Usuario usr = new Usuario();
 
-        usr.setCi("51396218");
+        usr.setCi("11111111");
         usr.setContrasenia("1");
-        usr.setCorreo("etchebarneluis@gmail.com");
+        usr.setCorreo("admin@gmail.com");
 
         s.persist(usr);
         s.refresh(usr);
 
-        Cliente cli = new Cliente();
+        Administrador admin = new Administrador();
+
+        admin.setUsuario(usr);
+        admin.setAdminGeneral(true);
+         */ /*Cliente cli = new Cliente();
         cli.setUsuario(usr);
         cli.setNombre("Luis");
         cli.setMesNacimiento(1);
@@ -116,9 +129,7 @@ public class Main {
         cli.setTelefonos(tel);
 
         s.persist(cli);
-        s.refresh(cli);
-
-        //termina la magia */
+        s.refresh(cli);*/
         System.out.println("Servidor Corriendo...");
 
         System.exit(0);
