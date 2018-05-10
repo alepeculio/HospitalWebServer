@@ -6,6 +6,7 @@
 package Clases;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -29,21 +31,35 @@ public class HorarioAtencion implements Serializable {
 
     @OneToMany(mappedBy = "horarioAtencion")
     private List<Turno> turnos;
-    
-    
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String dia;
-    private int horaInicio;
-    private int minInicio;
-    private int horaFin;
-    private int minFin;
+    @Temporal(javax.persistence.TemporalType.TIME)
+    private Date horaInicio;
+    @Temporal(javax.persistence.TemporalType.TIME)
+    private Date horaFin;
     private int clientesMax;
     private int clienteActual;
-    
-    
+
+    public Date getHoraInicio() {
+        return horaInicio;
+    }
+
+    public void setHoraInicio(Date horaInicio) {
+        this.horaInicio = horaInicio;
+    }
+
+    public Date getHoraFin() {
+        return horaFin;
+    }
+
+    public void setHoraFin(Date horaFin) {
+        this.horaFin = horaFin;
+    }
+
     public String getDia() {
         return dia;
     }
@@ -76,38 +92,6 @@ public class HorarioAtencion implements Serializable {
         this.turnos = turnos;
     }
 
-    public int getHoraInicio() {
-        return horaInicio;
-    }
-
-    public void setHoraInicio(int horaInicio) {
-        this.horaInicio = horaInicio;
-    }
-
-    public int getMinInicio() {
-        return minInicio;
-    }
-
-    public void setMinInicio(int minInicio) {
-        this.minInicio = minInicio;
-    }
-
-    public int getHoraFin() {
-        return horaFin;
-    }
-
-    public void setHoraFin(int horaFin) {
-        this.horaFin = horaFin;
-    }
-
-    public int getMinFin() {
-        return minFin;
-    }
-
-    public void setMinFin(int minFin) {
-        this.minFin = minFin;
-    }
-
     public int getClientesMax() {
         return clientesMax;
     }
@@ -123,8 +107,7 @@ public class HorarioAtencion implements Serializable {
     public void setClienteActual(int clienteActual) {
         this.clienteActual = clienteActual;
     }
-    
-    
+
     public Long getId() {
         return id;
     }
@@ -157,5 +140,5 @@ public class HorarioAtencion implements Serializable {
     public String toString() {
         return "Logica.HorarioAtencion[ id=" + id + " ]";
     }
-    
+
 }
