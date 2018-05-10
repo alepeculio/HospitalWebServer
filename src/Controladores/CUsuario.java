@@ -21,19 +21,22 @@ import javax.persistence.EntityManager;
 public class CUsuario {
 
     Singleton s = Singleton.getInstance();
-    
-    public static String obtenerTipo (Usuario u) {
-        List<Administrador> admins = CAdministradores.obtenerAdministradores ();
-        
-        if (admins != null)
-            for (Administrador a : admins)
-                if (a.getUsuario ().getCi ().equals (u.getCi ())) {
-                    if (a.isAdminGeneral ())
+
+    public static String obtenerTipo(Usuario u) {
+        List<Administrador> admins = CAdministradores.obtenerAdministradores();
+
+        if (admins != null) {
+            for (Administrador a : admins) {
+                if (a.getUsuario().getCi().equals(u.getCi())) {
+                    if (a.isAdminGeneral()) {
                         return "General";
-                    else
+                    } else {
                         return "Hospital";
+                    }
                 }
-        
+            }
+        }
+
         return "Cliente";
     }
 
@@ -41,7 +44,7 @@ public class CUsuario {
         EntityManager em = s.getEntity();
         em.getTransaction().begin();
         Usuario u = null;
-        
+
         try {
             u = (Usuario) em.createQuery("SELECT u FROM Usuario u WHERE ci= :cedula AND contrasenia= :pass", Usuario.class)
                     .setParameter("cedula", ci)
@@ -69,37 +72,10 @@ public class CUsuario {
             em.getTransaction().rollback();
             System.err.println("No se puedo encontrar el empleado relacionado al usuario con id: " + id);
         }
-
-        if (empleado != null) {
-
-            List<HorarioAtencion> ha = null;
-            em.getTransaction().begin();
-            try {
-                ha = (List<HorarioAtencion>) em.createNativeQuery("SELECT * FROM horarioatencion WHERE empleado_id=" + empleado.getId(), HorarioAtencion.class)
-                        .getResultList();
-                em.getTransaction().commit();
-            } catch (Exception e) {
-                em.getTransaction().rollback();
-            }
-            empleado.setHorariosAtencions(ha);
-
-            List<Suscripcion> s = null;
-            em.getTransaction().begin();
-            try {
-                s = (List<Suscripcion>) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id=" + empleado.getId(), Suscripcion.class)
-                        .getResultList();
-                em.getTransaction().commit();
-            } catch (Exception e) {
-                em.getTransaction().rollback();
-            }
-            empleado.setSuscripciones(s);
-
-        }
-
         return empleado;
     }
 
     public boolean altaCliente(Cliente cliente) {
-        return  s.persist(cliente);
+        return s.persist(cliente);
     }
 }

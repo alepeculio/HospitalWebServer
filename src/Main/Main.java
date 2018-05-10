@@ -1,16 +1,6 @@
 package Main;
 
-import Clases.Cliente;
-import Clases.Empleado;
-import Clases.HorarioAtencion;
-import Clases.TipoTurno;
-import Clases.Turno;
-import Clases.Usuario;
-import Controladores.CHospital;
 import Controladores.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  *
