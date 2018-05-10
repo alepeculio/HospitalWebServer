@@ -37,6 +37,9 @@ public class Hospital implements Serializable {
     private boolean publico;
     private String departamento;
     private String calle;
+    private String directora;
+    private String telefono;
+    private String correo;
     private int numero;
     private double latitud;
     private double longitud;
@@ -104,6 +107,32 @@ public class Hospital implements Serializable {
     public List<Suscripcion> getSuscripciones() {
         return suscripciones;
     }
+
+    public String getDirectora() {
+        return directora;
+    }
+
+    public void setDirectora(String directora) {
+        this.directora = directora;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+    
+    
 
     public void setSuscripciones(List<Suscripcion> suscripciones) {
         this.suscripciones = suscripciones;

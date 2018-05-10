@@ -69,17 +69,20 @@ public class CHospital {
         Singleton.getInstance().merge(h);
         return "";
     }
-
-    public static void modificarHospital(String nombre, Hospital h) {
-        Hospital viejo = obtenerHospital(nombre);
-        viejo.setNombre(h.getNombre());
-        viejo.setPublico(h.isPublico());
-        viejo.setDepartamento(h.getDepartamento());
-        viejo.setCalle(h.getCalle());
-        viejo.setNumero(h.getNumero());
-        viejo.setLatitud(h.getLatitud());
-        viejo.setLongitud(h.getLongitud());
-        Singleton.getInstance().merge(viejo);
+    
+    public static void modificarHospital (String nombre, Hospital h) {
+        Hospital viejo = obtenerHospital (nombre);
+        viejo.setNombre (h.getNombre ());
+        viejo.setDirectora (h.getDirectora ());
+        viejo.setPublico (h.isPublico ());
+        viejo.setCorreo (h.getCorreo ());
+        viejo.setTelefono (h.getTelefono ());
+        viejo.setDepartamento (h.getDepartamento ());
+        viejo.setCalle (h.getCalle ());
+        viejo.setNumero (h.getNumero ());
+        viejo.setLatitud (h.getLatitud ());
+        viejo.setLongitud (h.getLongitud ());
+        Singleton.getInstance ().merge (viejo);
     }
 
     public static void borrarHospital(String nombre) {
@@ -91,6 +94,7 @@ public class CHospital {
     }
 
     public static Hospital obtenerHospital(String nombre) {
+        
         List<Hospital> hospitales = obtenerHospitales();
 
         for (Hospital h : hospitales) {
