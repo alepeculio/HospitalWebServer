@@ -17,7 +17,7 @@ public class CCliente {
 
     public static List<Cliente> obtenerClientes() {
         List<Cliente> lista = null;
-        if(Singleton.getInstance().getEntity().getTransaction().isActive()){
+        if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
             Singleton.getInstance().getEntity().getTransaction().rollback();
         }
         Singleton.getInstance().getEntity().getTransaction().begin();
@@ -30,7 +30,7 @@ public class CCliente {
                 Singleton.getInstance().getEntity().getTransaction().rollback();
             }
         }
-        if(lista != null){
+        if (lista != null) {
             return lista;
         }
         return new ArrayList<>();
@@ -85,5 +85,13 @@ public class CCliente {
             return false;
         }
 
+    }
+
+    public static boolean altaCliente(Cliente cliente) {
+        return Singleton.getInstance().persist(cliente);
+    }
+
+    public static boolean bajaCliente(Cliente cliente) {
+        return Singleton.getInstance().remove(cliente);
     }
 }

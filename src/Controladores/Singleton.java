@@ -51,7 +51,7 @@ public class Singleton {
         return true;
     }
 
-    public void remove(Object object) {
+    public boolean remove(Object object) {
         EntityManager em = getEntity();
         em.getTransaction().begin();
         try {
@@ -62,7 +62,9 @@ public class Singleton {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
+            return false;
         }
+        return true;
     }
 
     public void refresh(Object object) {
