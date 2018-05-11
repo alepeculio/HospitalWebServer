@@ -1,7 +1,5 @@
 package Controladores;
 
-import Clases.Hospital;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -53,7 +51,12 @@ public class Singleton {
 
     public boolean remove(Object object) {
         EntityManager em = getEntity();
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+        }
+
         em.getTransaction().begin();
+
         try {
             em.remove(object);
             em.getTransaction().commit();

@@ -44,13 +44,13 @@ public class Cliente implements Serializable {
     private int anioNacimiento;
     @ManyToMany
     private List<Cliente> hijos;
-    @OneToOne (cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Usuario usuario;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Vacunacion> vacunacion;
-    @OneToMany(mappedBy = "cliente")
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Turno> turnos;
-    @OneToMany(mappedBy = "cliente")
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     List<Suscripcion> suscripciones;
 
     public long getId() {
