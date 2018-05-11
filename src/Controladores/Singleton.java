@@ -43,12 +43,12 @@ public class Singleton {
         try {
             em.persist(object);
             em.getTransaction().commit();
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
             em.getTransaction().rollback();
             return false;
         }
+        return true;
     }
 
     public void remove(Object object) {
@@ -59,8 +59,9 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            if (em.getTransaction().isActive ())
+            if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
+            }
         }
     }
 
@@ -72,12 +73,13 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            if (em.getTransaction().isActive ())
+            if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
+            }
         }
     }
 
-    public void merge(Object object) {
+    public boolean merge(Object object) {
         EntityManager em = getEntity();
         em.getTransaction().begin();
         try {
@@ -85,8 +87,11 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            if (em.getTransaction().isActive ())
+            if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
+            }
+            return false;
         }
+        return true;
     }
 }

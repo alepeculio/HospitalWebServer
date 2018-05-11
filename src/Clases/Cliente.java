@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -41,7 +42,7 @@ public class Cliente implements Serializable {
     private int diaNacimiento;
     private int mesNacimiento;
     private int anioNacimiento;
-    @OneToMany
+    @ManyToMany
     private List<Cliente> hijos;
     @OneToOne (cascade = CascadeType.ALL)
     private Usuario usuario;
