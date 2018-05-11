@@ -69,7 +69,7 @@ public class CCliente {
     public static boolean vincularHijoCliente(String idHijo, String idPadre) {
         Cliente padre = getCliente(Long.valueOf(idPadre));
         Cliente hijo = getCliente(Long.valueOf(idHijo));
-        if (!hijo.getHijos().contains(padre)) {
+        if (hijo.getHijos() == null ||hijo.getHijos() != null && !hijo.getHijos().contains(padre)) {
             padre.getHijos().add(hijo);
             return Singleton.getInstance().merge(padre);
         } else {
