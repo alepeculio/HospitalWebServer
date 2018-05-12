@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -42,15 +43,15 @@ public class Cliente implements Serializable {
     private int diaNacimiento;
     private int mesNacimiento;
     private int anioNacimiento;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Cliente> hijos;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Usuario usuario;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Vacunacion> vacunacion;
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Turno> turnos;
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     List<Suscripcion> suscripciones;
 
     public long getId() {
