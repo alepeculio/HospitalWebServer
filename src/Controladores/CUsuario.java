@@ -6,11 +6,9 @@
 package Controladores;
 
 import Clases.Administrador;
-import Clases.Cliente;
 import Clases.Empleado;
-import Clases.HorarioAtencion;
-import Clases.Suscripcion;
 import Clases.Usuario;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -52,7 +50,9 @@ public class CUsuario {
                     .getSingleResult();
             em.getTransaction().commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             System.out.println("No se encontró el usuario");
 
         }
@@ -69,10 +69,35 @@ public class CUsuario {
                     .getSingleResult();
             em.getTransaction().commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+
             System.err.println("No se puedo encontrar el empleado relacionado al usuario con id: " + id);
         }
         return empleado;
+    }
+
+    public List<Empleado> obtenerEmpleados() {
+        List<Empleado> lista = null;
+
+        try {
+            if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
+                Singleton.getInstance().getEntity().getTransaction().begin();
+            }
+            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE DTYPE = 'Empleado'", Empleado.class)
+                    .getResultList();
+            Singleton.getInstance().getEntity().getTransaction().commit();
+        } catch (Exception e) {
+            if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
+                Singleton.getInstance().getEntity().getTransaction().rollback();
+            }
+        }
+        
+        if (lista != null) {
+            return lista;
+        }
+        return new ArrayList<>();
     }
 
 }

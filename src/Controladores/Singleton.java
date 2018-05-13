@@ -3,11 +3,13 @@ package Controladores;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
 
 /**
  *
  * @author Jorge
  */
+@PersistenceContext
 public class Singleton {
 
     private static Singleton INSTANCE;
@@ -43,7 +45,9 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             return false;
         }
         return true;
@@ -51,10 +55,6 @@ public class Singleton {
 
     public boolean remove(Object object) {
         EntityManager em = getEntity();
-        if (em.getTransaction().isActive()) {
-            em.getTransaction().rollback();
-        }
-
         em.getTransaction().begin();
 
         try {

@@ -17,18 +17,20 @@ public class CCliente {
 
     public static List<Cliente> obtenerClientes() {
         List<Cliente> lista = null;
-        if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
-            Singleton.getInstance().getEntity().getTransaction().rollback();
-        }
-        Singleton.getInstance().getEntity().getTransaction().begin();
+
         try {
+            if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
+                Singleton.getInstance().getEntity().getTransaction().begin();
+            }
             lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente", Cliente.class)
                     .getResultList();
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
+            System.out.println("Controladores.CCliente.obtenerClientes(): Error en la transaccion");
             if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
                 Singleton.getInstance().getEntity().getTransaction().rollback();
             }
+
         }
         if (lista != null) {
             return lista;
