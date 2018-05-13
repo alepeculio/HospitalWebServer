@@ -99,5 +99,9 @@ public class CUsuario {
         }
         return new ArrayList<>();
     }
+    
+    public boolean bajaEmpleado(Empleado empleado) {
+        return s.remove(empleado);
+    }
 
 }

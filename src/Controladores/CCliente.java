@@ -38,6 +38,29 @@ public class CCliente {
         return new ArrayList<>();
     }
 
+    public static List<Cliente> obtenerClientesNoEmpleados() {
+        List<Cliente> lista = null;
+
+        try {
+            if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
+                Singleton.getInstance().getEntity().getTransaction().begin();
+            }
+            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE DTYPE = 'Cliente'", Cliente.class)
+                    .getResultList();
+            Singleton.getInstance().getEntity().getTransaction().commit();
+        } catch (Exception e) {
+            System.out.println("Controladores.CCliente.obtenerClientes(): Error en la transaccion");
+            if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
+                Singleton.getInstance().getEntity().getTransaction().rollback();
+            }
+
+        }
+        if (lista != null) {
+            return lista;
+        }
+        return new ArrayList<>();
+    }
+
     public static List<Cliente> obtenerNoHijosCliente(String idCliente) {
         List<Cliente> clientes = obtenerClientes();
         List<Cliente> hijos = new ArrayList<>();
@@ -64,9 +87,9 @@ public class CCliente {
     }
 
     public static Cliente getCliente(long id) {
-        Singleton.getInstance().getEntity().getTransaction().begin();
         Cliente cliente = null;
         try {
+            Singleton.getInstance().getEntity().getTransaction().begin();
             cliente = (Cliente) Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE id=" + id, Cliente.class)
                     .getSingleResult();
             Singleton.getInstance().getEntity().getTransaction().commit();
