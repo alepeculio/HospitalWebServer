@@ -41,7 +41,9 @@ public class Singleton {
         EntityManager em = getEntity();
 
         try {
-            em.getTransaction().begin();
+            if (!em.getTransaction().isActive()) {
+                em.getTransaction().begin();
+            }
             em.persist(object);
             em.getTransaction().commit();
         } catch (Exception e) {
