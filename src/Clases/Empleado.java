@@ -6,8 +6,10 @@
 package Clases;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 /**
@@ -20,7 +22,7 @@ public class Empleado extends Cliente implements Serializable {
     private String[] especialidades;
     private String[] titulos;
     private String tipo;
-    @OneToMany(mappedBy = "empleado")
+    @OneToMany(mappedBy = "empleado", fetch = FetchType.EAGER)
     private List<HorarioAtencion> horariosAtencions;
 
     public String[] getEspecialidades() {
@@ -54,6 +56,5 @@ public class Empleado extends Cliente implements Serializable {
     public void setHorariosAtencions(List<HorarioAtencion> horariosAtencions) {
         this.horariosAtencions = horariosAtencions;
     }
-    
-    
+
 }
