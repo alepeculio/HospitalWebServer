@@ -21,30 +21,12 @@ import java.util.List;
 public class CHospital {
     
     public static boolean agregaHorarioAtencion (Usuario u, int idEmpleado, HorarioAtencion ha) {
-        /*List<Administrador> administradores = CAdministradores.obtenerAdministradores ();
-        Hospital h = null;
-        
-        if (administradores == null)
-            return false;
-        
-        System.out.println("CHOSPITAL: 1");
-        
-        for (Administrador a : administradores)
-            if (a.getUsuario ().getId () == idEmpleado && !a.isAdminGeneral ()) {
-                Singleton.getInstance ().refresh (a);
-                h = a.getHospital ();
-                break;
-            }*/
-        
-        System.out.println("CHOSPITAL: 2");
         Hospital h = CAdministradores.obtenerHospitalAdministrador (u.getCi ());
         if (h == null)
             return false;
-        System.out.println("CHOSPITAL: 3 " + h.getId ());
         
         List<Cliente> clientes = CCliente.obtenerClientes ();
         Empleado e = null;
-        System.out.println("CHOSPITAL: 4");
         
         for (Cliente c : clientes)
             if (c instanceof Empleado)
@@ -52,15 +34,12 @@ public class CHospital {
                     e = (Empleado) c;
                     break;
                 }
-        System.out.println("CHOSPITAL: 5");
         
         if (e == null)
             return false;
-        System.out.println("CHOSPITAL: 6");
         
         if (!Singleton.getInstance ().persist (ha))
             return false;
-        System.out.println("CHOSPITAL: 7");
         
         h.agregarHA (ha);
         e.agregarHA (ha);
@@ -69,11 +48,9 @@ public class CHospital {
         
         if (!Singleton.getInstance ().merge (h))
             return false;
-        System.out.println("CHOSPITAL: 8");
         
         if (!Singleton.getInstance ().merge (e))
             return false;
-        System.out.println("CHOSPITAL: 9");
         
         return true;
     }
