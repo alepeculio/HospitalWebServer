@@ -22,7 +22,7 @@ public class CCliente {
             if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
                 Singleton.getInstance().getEntity().getTransaction().begin();
             }
-            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente", Cliente.class)
+            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE activo = 1", Cliente.class)
                     .getResultList();
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class CCliente {
             if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
                 Singleton.getInstance().getEntity().getTransaction().begin();
             }
-            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE DTYPE = 'Cliente'", Cliente.class)
+            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE DTYPE = 'Cliente' AND activo = 1", Cliente.class)
                     .getResultList();
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class CCliente {
         return new ArrayList<>();
     }
 
-    public static List<Cliente> obtenerNoHijosCliente(String idCliente) {
+    public List<Cliente> obtenerNoHijosCliente(String idCliente) {
         List<Cliente> clientes = obtenerClientes();
         List<Cliente> hijos = new ArrayList<>();
         List<Cliente> noHijos = new ArrayList<>();
@@ -95,11 +95,25 @@ public class CCliente {
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
             Singleton.getInstance().getEntity().getTransaction().rollback();
-            System.err.println("No se puedo encontrar el cliente relacionado al usuario con id: " + id);
+            System.err.println("No se puedo encontrar el cliente con id: " + id);
         }
         return cliente;
     }
 
+    public static Cliente getClientebyUsuario(long idUsuario) {
+        Cliente cliente = null;
+        try {
+            Singleton.getInstance().getEntity().getTransaction().begin();
+            cliente = (Cliente) Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE usuario_id=" + idUsuario, Cliente.class)
+                    .getSingleResult();
+            Singleton.getInstance().getEntity().getTransaction().commit();
+        } catch (Exception e) {
+            Singleton.getInstance().getEntity().getTransaction().rollback();
+            System.err.println("No se puedo encontrar el cliente relacionado al usuario con id: " + idUsuario);
+        }
+        return cliente;
+    }
+    
     public static boolean vincularHijoCliente(String idHijo, String idPadre) {
         Cliente padre = getCliente(Long.valueOf(idPadre));
         Cliente hijo = getCliente(Long.valueOf(idHijo));
@@ -116,7 +130,9 @@ public class CCliente {
         return Singleton.getInstance().persist(cliente);
     }
 
-    public static boolean bajaCliente(Cliente cliente) {
-        return Singleton.getInstance().remove(cliente);
+    public static boolean bajaCliente(String idCliente) {
+        Cliente cliente = getCliente(Long.valueOf(idCliente));
+        cliente.setActivo(false);
+        return Singleton.getInstance().merge(cliente);
     }
 }

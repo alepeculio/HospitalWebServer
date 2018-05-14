@@ -39,8 +39,11 @@ public class Singleton {
 
     public boolean persist(Object object) {
         EntityManager em = getEntity();
-        em.getTransaction().begin();
+
         try {
+            if (!em.getTransaction().isActive()) {
+                em.getTransaction().begin();
+            }
             em.persist(object);
             em.getTransaction().commit();
         } catch (Exception e) {
@@ -99,5 +102,5 @@ public class Singleton {
         }
         return true;
     }
-    
+
 }
