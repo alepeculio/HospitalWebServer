@@ -8,6 +8,7 @@ package Clases;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,10 +24,10 @@ import javax.persistence.Temporal;
 @Entity
 public class HorarioAtencion implements Serializable {
 
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.ALL)
     private Empleado empleado;
 
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.ALL)
     private Hospital hospital;
 
     @OneToMany(mappedBy = "horarioAtencion")

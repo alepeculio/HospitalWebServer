@@ -6,8 +6,11 @@
 package Clases;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 /**
@@ -20,8 +23,15 @@ public class Empleado extends Cliente implements Serializable {
     private String[] especialidades;
     private String[] titulos;
     private String tipo;
-    @OneToMany(mappedBy = "empleado")
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HorarioAtencion> horariosAtencions;
+    
+    public void agregarHA (HorarioAtencion ha) {
+        if (horariosAtencions == null)
+            horariosAtencions = new ArrayList<>();
+        
+        horariosAtencions.add (ha);
+    }
 
     public String[] getEspecialidades() {
         return especialidades;

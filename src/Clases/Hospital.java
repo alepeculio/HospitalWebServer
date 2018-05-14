@@ -45,7 +45,7 @@ public class Hospital implements Serializable {
     private List<Suscripcion> suscripciones;
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Administrador> administradores;
-    @OneToMany(mappedBy = "hospital")
+    @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorarioAtencion> horarioAtencions;
 
     public List<HorarioAtencion> getHorarioAtencions() {
@@ -93,6 +93,14 @@ public class Hospital implements Serializable {
 
     public String getDirectora() {
         return directora;
+    }
+    
+    public void agregarHA(HorarioAtencion ha) {
+        if (horarioAtencions == null) {
+            horarioAtencions = new ArrayList<>();
+        }
+
+        horarioAtencions.add(ha);
     }
 
     public void setDirectora(String directora) {

@@ -43,15 +43,15 @@ public class Cliente implements Serializable {
     private int diaNacimiento;
     private int mesNacimiento;
     private int anioNacimiento;
-    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Cliente> hijos;
-    @OneToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Usuario usuario;
-    @OneToMany(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Vacunacion> vacunacion;
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Turno> turnos;
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     List<Suscripcion> suscripciones;
 
     public long getId() {

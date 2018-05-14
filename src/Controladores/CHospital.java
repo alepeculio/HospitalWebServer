@@ -6,6 +6,9 @@
 package Controladores;
 
 import Clases.Administrador;
+import Clases.Cliente;
+import Clases.Empleado;
+import Clases.HorarioAtencion;
 import Clases.Hospital;
 import Clases.Usuario;
 import java.util.ArrayList;
@@ -16,6 +19,52 @@ import java.util.List;
  * @author Jorge
  */
 public class CHospital {
+    
+    public static boolean agregaHorarioAtencion (Usuario u, int idEmpleado, HorarioAtencion ha) {
+        List<Administrador> administradores = CAdministradores.obtenerAdministradores ();
+        Hospital h = null;
+        
+        if (administradores == null)
+            return false;
+        
+        for (Administrador a : administradores)
+            if (a.getUsuario ().getId () == idEmpleado && !a.isAdminGeneral ()) {
+                h = a.getHospital ();
+                break;
+            }
+        
+        if (h == null)
+            return false;
+        
+        List<Cliente> clientes = CCliente.obtenerClientes ();
+        Empleado e = null;
+        
+        for (Cliente c : clientes)
+            if (c instanceof Empleado)
+                if (c.getUsuario ().getId () == idEmpleado) {
+                    e = (Empleado) c;
+                    break;
+                }
+        
+        if (e == null)
+            return false;
+        
+        if (!Singleton.getInstance ().persist (ha))
+            return false;
+        
+        h.agregarHA (ha);
+        e.agregarHA (ha);
+        ha.setEmpleado (e);
+        ha.setHospital (h);
+        
+        if (!Singleton.getInstance ().merge (h))
+            return false;
+        
+        if (!Singleton.getInstance ().merge (e))
+            return false;
+        
+        return true;
+    }
     
     public static void borrarAdministrador (String nomHospital, String ciAdmin) {
         Hospital h = obtenerHospital (nomHospital);
