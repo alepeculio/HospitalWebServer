@@ -5,6 +5,7 @@
  */
 package Clases;
 
+import Controladores.Singleton;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -14,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -22,7 +24,7 @@ import javax.persistence.OneToOne;
  * @author Jorge
  */
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Cliente implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,7 +45,7 @@ public class Cliente implements Serializable {
     private int anioNacimiento;
     @OneToMany
     private List<Cliente> hijos;
-    @OneToOne (cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Usuario usuario;
     @OneToMany
     private List<Vacunacion> vacunacion;
@@ -51,6 +53,8 @@ public class Cliente implements Serializable {
     private List<Turno> turnos;
     @OneToMany(mappedBy = "cliente")
     List<Suscripcion> suscripciones;
+
+
 
     public long getId() {
         return id;

@@ -6,6 +6,14 @@
 package Controladores;
 
 import Clases.Cliente;
+import Clases.Cliente;
+import Clases.Empleado;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 import java.util.List;
 
 /**
@@ -26,6 +34,19 @@ public class CCliente {
         return lista;
     }
 
+    public static Cliente obtenerCliente(String nombre) {
+
+        List<Cliente> clientes = obtenerClientes();
+
+        for (Cliente c : clientes) {
+            if (c.getNombre().equals(nombre)) {
+                return c;
+            }
+        }
+
+        return null;
+    }
+
     public static void RegistrarHijoPlanVacunacion(Cliente padre, Cliente hijo) {
 
     }
@@ -41,5 +62,40 @@ public class CCliente {
     public static void CancelarTurnoVacunacion(String[] args) {
 
     }
+
+    public static List<Cliente> edad(Cliente c, int edad, String en) {
+        List<Cliente> hijos = c.getHijos();
+        List<Cliente> hijosXedad = null;
+        for (Cliente hijo : hijos) {
+            String Nac = String.valueOf(hijo.getDiaNacimiento()) + "/" + String.valueOf(hijo.getMesNacimiento()) + "/" + String.valueOf(hijo.getAnioNacimiento());
+            Date F = new Date();
+            F.setYear(hijo.getAnioNacimiento() - 1900);
+            F.setMonth(hijo.getMesNacimiento() - 1);
+            F.setDate(hijo.getDiaNacimiento());
+            SimpleDateFormat formatoDeFecha = new SimpleDateFormat("dd/MM/yyyy");
+            String fecha = formatoDeFecha.format(F);
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate fechaNac = LocalDate.parse(fecha, fmt);
+            LocalDate ahora = LocalDate.now();
+            Period periodo = Period.between(fechaNac, ahora);
+            if ("m".equals("en")) {
+                if (periodo.getMonths() == edad) {
+                    hijosXedad.add(hijo);
+                } else {
+                    return null;
+                }
+            } else {
+                if (periodo.getYears() == edad) {
+                    hijosXedad.add(hijo);
+                } else {
+                    return null;
+                }
+            }
+        }
+        return hijosXedad;
+
+    }
+
+
 
 }
