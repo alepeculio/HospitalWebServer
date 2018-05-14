@@ -14,6 +14,7 @@ import java.util.List;
  * @author Jorge
  */
 public class CCliente {
+    
 
     public static List<Cliente> obtenerClientes() {
         List<Cliente> lista = null;

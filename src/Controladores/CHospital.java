@@ -25,16 +25,7 @@ public class CHospital {
         if (h == null)
             return false;
         
-        List<Cliente> clientes = CCliente.obtenerClientes ();
-        Empleado e = null;
-        
-        for (Cliente c : clientes)
-            if (c instanceof Empleado)
-                if (c.getUsuario ().getId () == idEmpleado) {
-                    e = (Empleado) c;
-                    break;
-                }
-        
+        Empleado e = new CUsuario().getEmpleado (idEmpleado);
         if (e == null)
             return false;
         
