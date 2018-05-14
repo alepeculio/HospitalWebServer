@@ -6,9 +6,10 @@
 package Clases;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 /**
@@ -18,12 +19,12 @@ import javax.persistence.OneToMany;
 @Entity
 public class Empleado extends Cliente implements Serializable {
 
-    @ManyToMany(mappedBy = "empleados")
+    @OneToMany(mappedBy = "empleado")
     private List<Hospital> hospitals;    
     private String[] especialidades;
     private String[] titulos;
     private String tipo;
-    @OneToMany(mappedBy = "empleado")
+    @OneToMany(mappedBy = "empleado", fetch = FetchType.EAGER)
     private List<HorarioAtencion> horariosAtencions;
 
     public String[] getEspecialidades() {

@@ -16,6 +16,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -25,6 +26,9 @@ import javax.persistence.OneToOne;
  */
 @Entity
 public class Hospital implements Serializable {
+
+    @ManyToOne
+    private Empleado empleado;
 
     private static final long serialVersionUID = 1L;
 

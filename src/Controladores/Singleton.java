@@ -1,15 +1,15 @@
 package Controladores;
 
-import Clases.Hospital;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
 
 /**
  *
  * @author Jorge
  */
+@PersistenceContext
 public class Singleton {
 
     private static Singleton INSTANCE;
@@ -39,29 +39,38 @@ public class Singleton {
 
     public boolean persist(Object object) {
         EntityManager em = getEntity();
-        em.getTransaction().begin();
+
         try {
+            if (!em.getTransaction().isActive()) {
+                em.getTransaction().begin();
+            }
             em.persist(object);
             em.getTransaction().commit();
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             return false;
         }
+        return true;
     }
 
-    public void remove(Object object) {
+    public boolean remove(Object object) {
         EntityManager em = getEntity();
         em.getTransaction().begin();
+
         try {
             em.remove(object);
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            if (em.getTransaction().isActive ())
+            if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
+            }
+            return false;
         }
+        return true;
     }
 
     public void refresh(Object object) {
@@ -72,12 +81,13 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            if (em.getTransaction().isActive ())
+            if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
+            }
         }
     }
 
-    public void merge(Object object) {
+    public boolean merge(Object object) {
         EntityManager em = getEntity();
         em.getTransaction().begin();
         try {
@@ -85,8 +95,12 @@ public class Singleton {
             em.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
-            if (em.getTransaction().isActive ())
+            if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
+            }
+            return false;
         }
+        return true;
     }
+
 }
