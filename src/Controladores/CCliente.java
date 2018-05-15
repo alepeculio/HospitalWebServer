@@ -21,12 +21,8 @@ import java.util.List;
 public class CCliente {
 
     public static List<Cliente> obtenerClientes() {
-
         List<Cliente> lista = null;
-
         try {
-
-            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente", Cliente.class).getResultList();
             if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
                 Singleton.getInstance().getEntity().getTransaction().begin();
             }
@@ -38,7 +34,6 @@ public class CCliente {
             if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
                 Singleton.getInstance().getEntity().getTransaction().rollback();
             }
-
         }
         if (lista != null) {
             return lista;
@@ -121,7 +116,7 @@ public class CCliente {
         }
         return cliente;
     }
-    
+
     public static boolean vincularHijoCliente(String idHijo, String idPadre) {
         Cliente padre = getCliente(Long.valueOf(idPadre));
         Cliente hijo = getCliente(Long.valueOf(idHijo));
@@ -206,7 +201,5 @@ public class CCliente {
         return hijosXedad;
 
     }
-
-
 
 }

@@ -6,7 +6,9 @@
 package Controladores;
 
 import Clases.Administrador;
+import Clases.Cliente;
 import Clases.Empleado;
+import Clases.HorarioAtencion;
 import Clases.Hospital;
 import Clases.Usuario;
 import java.util.ArrayList;
@@ -22,6 +24,48 @@ public class CHospital {
         Hospital h = obtenerHospital(nomHospital);
         h.removerAdministrador(ciAdmin);
         Singleton.getInstance().merge(h);
+    }
+
+    public static boolean agregaHorarioAtencion(Usuario u, int idEmpleado, HorarioAtencion ha) {
+        Hospital h = CAdministradores.obtenerHospitalAdministrador(u.getCi());
+        if (h == null) {
+            return false;
+        }
+
+        List<Cliente> clientes = CCliente.obtenerClientes();
+        Empleado e = null;
+
+        for (Cliente c : clientes) {
+            if (c instanceof Empleado) {
+                if (c.getUsuario().getId() == idEmpleado) {
+                    e = (Empleado) c;
+                    break;
+                }
+            }
+        }
+
+        if (e == null) {
+            return false;
+        }
+
+        if (!Singleton.getInstance().persist(ha)) {
+            return false;
+        }
+
+        h.agregarHA(ha);
+        e.agregarHA(ha);
+        ha.setEmpleado(e);
+        ha.setHospital(h);
+
+        if (!Singleton.getInstance().merge(h)) {
+            return false;
+        }
+
+        if (!Singleton.getInstance().merge(e)) {
+            return false;
+        }
+
+        return true;
     }
 
     public static void modificarAdministrador(String nomHospital, Usuario u) {
@@ -69,20 +113,20 @@ public class CHospital {
         Singleton.getInstance().merge(h);
         return "";
     }
-    
-    public static void modificarHospital (String nombre, Hospital h) {
-        Hospital viejo = obtenerHospital (nombre);
-        viejo.setNombre (h.getNombre ());
-        viejo.setDirectora (h.getDirectora ());
-        viejo.setPublico (h.isPublico ());
-        viejo.setCorreo (h.getCorreo ());
-        viejo.setTelefono (h.getTelefono ());
-        viejo.setDepartamento (h.getDepartamento ());
-        viejo.setCalle (h.getCalle ());
-        viejo.setNumero (h.getNumero ());
-        viejo.setLatitud (h.getLatitud ());
-        viejo.setLongitud (h.getLongitud ());
-        Singleton.getInstance ().merge (viejo);
+
+    public static void modificarHospital(String nombre, Hospital h) {
+        Hospital viejo = obtenerHospital(nombre);
+        viejo.setNombre(h.getNombre());
+        viejo.setDirectora(h.getDirectora());
+        viejo.setPublico(h.isPublico());
+        viejo.setCorreo(h.getCorreo());
+        viejo.setTelefono(h.getTelefono());
+        viejo.setDepartamento(h.getDepartamento());
+        viejo.setCalle(h.getCalle());
+        viejo.setNumero(h.getNumero());
+        viejo.setLatitud(h.getLatitud());
+        viejo.setLongitud(h.getLongitud());
+        Singleton.getInstance().merge(viejo);
     }
 
     public static void borrarHospital(String nombre) {
@@ -94,7 +138,6 @@ public class CHospital {
     }
 
     public static Hospital obtenerHospital(String nombre) {
-        
         List<Hospital> hospitales = obtenerHospitales();
 
         for (Hospital h : hospitales) {
@@ -117,7 +160,6 @@ public class CHospital {
         }
         return lista;
     }
-
 
     public static List<Empleado> obtenerEmpleados(String nombreH) {
 

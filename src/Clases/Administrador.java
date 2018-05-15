@@ -28,8 +28,7 @@ public class Administrador implements Serializable {
     private boolean adminGeneral;
     @OneToOne (cascade = CascadeType.ALL)
     private Usuario usuario;
-    @OneToOne
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.ALL)
     private Hospital hospital;
 
     public boolean isAdminGeneral() {
