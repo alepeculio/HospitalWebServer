@@ -19,6 +19,20 @@ import javax.persistence.EntityManager;
  */
 public class CAdministradores {
     
+    public static Administrador getAdminByUsuario(long idUsuario) {
+        Administrador admin = null;
+        try {
+            Singleton.getInstance().getEntity().getTransaction().begin();
+            admin = (Administrador) Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM administrador WHERE usuario_id=" + idUsuario, Administrador.class)
+                    .getSingleResult();
+            Singleton.getInstance().getEntity().getTransaction().commit();
+        } catch (Exception e) {
+            Singleton.getInstance().getEntity().getTransaction().rollback();
+            System.err.println("No se puedo encontrar el cliente relacionado al usuario con id: " + idUsuario);
+        }
+        return admin;
+    }
+    
     public static Hospital obtenerHospitalAdministrador (String ci) {
         EntityManager em = Singleton.getInstance ().getEntity();
         em.getTransaction().begin();

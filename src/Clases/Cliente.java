@@ -18,6 +18,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
 
 /**
  *
@@ -30,18 +32,31 @@ public class Cliente implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Expose
     private long id;
+    @Expose
     private String nombre;
+    @Expose
     private String apellido;
+    @Expose
     private String[] telefonos;
+    @Expose
     private String calle;
+    @Expose
     private String departamento;
+    @Expose
     private String ciudad;
+    @Expose
     private int numero;
+    @Expose
     private int piso;
+    @Expose
     private int apartamento;
+    @Expose
     private int diaNacimiento;
+    @Expose
     private int mesNacimiento;
+    @Expose
     private int anioNacimiento;
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Cliente> hijos;
@@ -53,6 +68,7 @@ public class Cliente implements Serializable {
     private List<Turno> turnos;
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     List<Suscripcion> suscripciones;
+    @Expose
     private boolean activo = true;
 
     public boolean isActivo() {

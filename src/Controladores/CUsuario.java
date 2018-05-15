@@ -86,7 +86,7 @@ public class CUsuario {
         return empleado;
     }
 
-    public Empleado getEmpleado(long id) {
+    public static Empleado getEmpleado(long id) {
         Empleado empleado = null;
         try {
             Singleton.getInstance().getEntity().getTransaction().begin();
@@ -100,7 +100,7 @@ public class CUsuario {
         return empleado;
     }
 
-    public List<Empleado> obtenerEmpleados() {
+    public static List<Empleado> obtenerEmpleados() {
         List<Empleado> lista = null;
 
         try {

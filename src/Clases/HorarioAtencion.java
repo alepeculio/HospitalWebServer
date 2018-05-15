@@ -5,6 +5,7 @@
  */
 package Clases;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -36,13 +37,19 @@ public class HorarioAtencion implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Expose
     private Long id;
+    @Expose
     private String dia;
+    @Expose
     @Temporal(javax.persistence.TemporalType.TIME)
     private Date horaInicio;
+    @Expose
     @Temporal(javax.persistence.TemporalType.TIME)
     private Date horaFin;
+    @Expose
     private int clientesMax;
+    @Expose
     private int clienteActual;
 
     public Date getHoraInicio() {

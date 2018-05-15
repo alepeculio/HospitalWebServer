@@ -13,6 +13,7 @@ import Clases.Hospital;
 import Clases.Usuario;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.EntityManager;
 
 /**
  *
@@ -20,12 +21,51 @@ import java.util.List;
  */
 public class CHospital {
     
+    public static boolean eliminarHorarioAtencion (int id) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        try {
+            em.createNativeQuery("DELETE FROM horarioatencion WHERE id = " + id)
+                    .executeUpdate ();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se eimino el horairo de atencion");
+            return false;
+        }
+        return true;
+    }
+    
+    public static List<HorarioAtencion> obtenerHorariosAtencion (long idEmpleado, Usuario u) {
+        long idHospital = CAdministradores.getAdminByUsuario (u.getId ()).getHospital ().getId ();
+        
+        EntityManager em = Singleton.getInstance ().getEntity();
+        em.getTransaction().begin();
+        List<HorarioAtencion> lista = new ArrayList<>();
+
+        try {
+            lista = (List<HorarioAtencion>) em.createNativeQuery("SELECT ha.* FROM horarioatencion AS ha, cliente AS c, hospital AS h WHERE ha.empleado_id = c.id AND ha.hospital_id AND c.id = :idEmpleado AND h.id = :idHospital", HorarioAtencion.class)
+                    .setParameter("idEmpleado", idEmpleado)
+                    .setParameter("idHospital", idHospital)
+                    .getResultList ();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se encontraron los horairos de atencion");
+        }
+        return lista;
+    }
+    
     public static boolean agregaHorarioAtencion (Usuario u, int idEmpleado, HorarioAtencion ha) {
         Hospital h = CAdministradores.obtenerHospitalAdministrador (u.getCi ());
         if (h == null)
             return false;
         
-        Empleado e = new CUsuario().getEmpleado (idEmpleado);
+        Empleado e = CUsuario.getEmpleado (idEmpleado);
         if (e == null)
             return false;
         
