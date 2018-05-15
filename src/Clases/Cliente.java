@@ -5,6 +5,7 @@
  */
 package Clases;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -60,6 +61,7 @@ public class Cliente implements Serializable {
     private int anioNacimiento;
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Cliente> hijos;
+    @Expose
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Usuario usuario;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
