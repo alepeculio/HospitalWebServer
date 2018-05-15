@@ -30,6 +30,7 @@ public class CHospital {
         Hospital h = CAdministradores.obtenerHospitalAdministrador(u.getCi());
         if (h == null) {
             return false;
+
         }
 
         List<Cliente> clientes = CCliente.obtenerClientes();
@@ -45,6 +46,7 @@ public class CHospital {
         }
 
         if (e == null) {
+
             return false;
         }
 

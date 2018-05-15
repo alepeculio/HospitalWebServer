@@ -23,6 +23,7 @@ public class CUsuario {
 
     public static String obtenerTipo(Usuario u) {
         List<Administrador> admins = CAdministradores.obtenerAdministradores();
+        List<Cliente> soloClientes = CCliente.obtenerClientesNoEmpleados();
 
         if (admins != null) {
             for (Administrador a : admins) {
@@ -36,7 +37,15 @@ public class CUsuario {
             }
         }
 
-        return "Cliente";
+        if (soloClientes != null) {
+            for (Cliente c : soloClientes) {
+                if (c.getUsuario() == u) {
+                    return "Cliente";
+                }
+            }
+        }
+
+        return "Empleado";
     }
 
     public Usuario login(String ci, String contrasenia) {
@@ -78,7 +87,7 @@ public class CUsuario {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            
+
             e.printStackTrace();
 
             System.err.println("No se puedo encontrar el empleado relacionado al usuario con id: " + id);
@@ -86,7 +95,7 @@ public class CUsuario {
         return empleado;
     }
 
-    public Empleado getEmpleado(long id) {
+    public static Empleado getEmpleado(long id) {
         Empleado empleado = null;
         try {
             Singleton.getInstance().getEntity().getTransaction().begin();
@@ -100,7 +109,7 @@ public class CUsuario {
         return empleado;
     }
 
-    public List<Empleado> obtenerEmpleados() {
+    public static List<Empleado> obtenerEmpleados() {
         List<Empleado> lista = null;
 
         try {
@@ -153,7 +162,7 @@ public class CUsuario {
 
     public boolean cedulaExiste(String cedula) {
         EntityManager em = s.getEntity();
-        
+
         Usuario u = null;
 
         try {
