@@ -78,6 +78,8 @@ public class CUsuario {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
+            
+            e.printStackTrace();
 
             System.err.println("No se puedo encontrar el empleado relacionado al usuario con id: " + id);
         }

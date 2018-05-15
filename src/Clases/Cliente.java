@@ -45,7 +45,7 @@ public class Cliente implements Serializable {
     private int mesNacimiento;
     private int anioNacimiento;
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Cliente> hijos;
+    private List<Cliente> hijos ;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Usuario usuario;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

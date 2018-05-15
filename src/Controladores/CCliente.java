@@ -19,6 +19,7 @@ import java.util.List;
  * @author Jorge
  */
 public class CCliente {
+    
 
     public static List<Cliente> obtenerClientes() {
         List<Cliente> lista = null;
@@ -170,9 +171,14 @@ public class CCliente {
     }
 
     public static List<Cliente> edad(Cliente c, int edad, String en) {
+        System.out.println("ok");
+        
         List<Cliente> hijos = c.getHijos();
-        List<Cliente> hijosXedad = null;
+         
+        List<Cliente> hijosXedad = new ArrayList<>() ;
+
         for (Cliente hijo : hijos) {
+            
             String Nac = String.valueOf(hijo.getDiaNacimiento()) + "/" + String.valueOf(hijo.getMesNacimiento()) + "/" + String.valueOf(hijo.getAnioNacimiento());
             Date F = new Date();
             F.setYear(hijo.getAnioNacimiento() - 1900);
@@ -184,22 +190,18 @@ public class CCliente {
             LocalDate fechaNac = LocalDate.parse(fecha, fmt);
             LocalDate ahora = LocalDate.now();
             Period periodo = Period.between(fechaNac, ahora);
-            if ("m".equals("en")) {
+
+            if ("m".equals(en)) {
                 if (periodo.getMonths() == edad) {
                     hijosXedad.add(hijo);
-                } else {
-                    return null;
-                }
+                } 
             } else {
                 if (periodo.getYears() == edad) {
                     hijosXedad.add(hijo);
-                } else {
-                    return null;
                 }
             }
         }
         return hijosXedad;
-
     }
 
 }
