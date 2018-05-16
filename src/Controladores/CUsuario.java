@@ -157,29 +157,6 @@ public class CUsuario {
         return s.merge(empleado);
     }
 
-    public boolean correoExiste(String correo) {
-        EntityManager em = s.getEntity();
-
-        Usuario u = null;
-
-        try {
-            if (!em.getTransaction().isActive()) {
-                em.getTransaction().begin();
-            }
-            u = (Usuario) em.createQuery("SELECT u FROM Usuario u WHERE correo= :c", Usuario.class)
-                    .setParameter("c", correo)
-                    .getSingleResult();
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            System.out.println("Error en la transaccion, usuario con correo: " + correo);
-        }
-        return u != null;
-
-    }
-
     public boolean cedulaExiste(String cedula) {
         EntityManager em = s.getEntity();
 
@@ -189,7 +166,7 @@ public class CUsuario {
             if (!em.getTransaction().isActive()) {
                 em.getTransaction().begin();
             }
-            u = (Usuario) em.createQuery("SELECT u FROM Usuario u WHERE ci= :cedula", Usuario.class)
+            u = (Usuario) em.createQuery("FROM Usuario U WHERE U.ci= :cedula", Usuario.class)
                     .setParameter("cedula", cedula)
                     .getSingleResult();
             em.getTransaction().commit();
