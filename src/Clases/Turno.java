@@ -32,8 +32,20 @@ public class Turno implements Serializable {
     private long id;
     private TipoTurno tipo;
     private int numero;
-    private boolean finalizado;
+    private EstadoTurno estado;
 
+    public Turno (){
+        estado = EstadoTurno.INGRESADO;
+    }
+
+    public EstadoTurno getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoTurno estado) {
+        this.estado = estado;
+    }
+    
     public Cliente getCliente() {
         return cliente;
     }
@@ -48,9 +60,7 @@ public class Turno implements Serializable {
 
     public void setHorarioAtencion(HorarioAtencion horarioAtencion) {
         this.horarioAtencion = horarioAtencion;
-    }
-
-    
+    }   
     
     public TipoTurno getTipo() {
         return tipo;
@@ -66,14 +76,6 @@ public class Turno implements Serializable {
 
     public void setNumero(int numero) {
         this.numero = numero;
-    }
-
-    public boolean isFinalizado() {
-        return finalizado;
-    }
-
-    public void setFinalizado(boolean finalizado) {
-        this.finalizado = finalizado;
     }
     
     public long getId() {

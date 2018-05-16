@@ -24,8 +24,12 @@ public class Usuario implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String ci;
-    private String contrasenia = this.getContraseniaInicial();
+    private String contrasenia;
     private String correo;
+
+    public Usuario() {
+        this.contrasenia = "1"; //this.getContraseniaInicial();
+    }
 
     public long getId() {
         return id;
