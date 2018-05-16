@@ -78,6 +78,7 @@ public class Hospital implements Serializable {
         
         for (int i = 0; i < administradores.size (); i++)
             if (administradores.get (i).getUsuario ().getCi ().equals (ciAdmin)) {
+                administradores.get (i).setHospital (null);
                 administradores.remove (i);
                 return;
             }

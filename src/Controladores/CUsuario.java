@@ -20,6 +20,26 @@ import javax.persistence.EntityManager;
 public class CUsuario {
 
     Singleton s = Singleton.getInstance();
+    
+    public static boolean cambiarPass (long idUsuario, String nuevaPass) {
+        EntityManager em = Singleton.getInstance ().getEntity();
+        em.getTransaction().begin();
+        try {
+            em.createNativeQuery("UPDATE usuario SET contrasenia = :contrasenia WHERE id = :id")
+                    .setParameter("id", idUsuario)
+                    .setParameter("contrasenia", nuevaPass)
+                    .executeUpdate ();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace ();
+            System.out.println("No se pudo cambiar pass");
+            return false;
+        }
+        return true;
+    }
 
     public static String obtenerTipo(Usuario u) {
         List<Administrador> admins = CAdministradores.obtenerAdministradores();
