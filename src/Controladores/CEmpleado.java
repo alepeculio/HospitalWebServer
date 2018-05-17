@@ -6,7 +6,7 @@ import Clases.Turno;
 import java.util.List;
 
 public class CEmpleado {
-
+    
     public static Turno obtenerTurno(long id) {
         Turno turno = null;
         try {
@@ -24,7 +24,7 @@ public class CEmpleado {
         }
         return turno;
     }
-
+    
     public static HorarioAtencion obtenerHorarioAtencion(long id) {
         HorarioAtencion horarioAtencion = null;
         try {
@@ -42,7 +42,7 @@ public class CEmpleado {
         }
         return horarioAtencion;
     }
-
+    
     public static String actualizarHA(String idHA, String idTurno, EstadoTurno estado) {
         HorarioAtencion ha = obtenerHorarioAtencion(Long.valueOf(idHA));
         List<Turno> turnos = ha.getTurnos();
@@ -51,24 +51,28 @@ public class CEmpleado {
         for (Turno turno : turnos) {
             if (turno.getId() == Long.valueOf(idTurno)) {
                 turno.setEstado(estado);
-                ha.setClienteActual(turno.getNumero());
+                if (estado == EstadoTurno.FINALIZADO) {
+                    ha.setClienteActual(0);
+                } else {
+                    ha.setClienteActual(turno.getNumero());
+                }
             }
             if (turno.getEstado().equals(EstadoTurno.FINALIZADO)) {
                 turnosFinalizados++;
             }
         }
-
+        
         if (ha.getEstado().equals(EstadoTurno.PENDIENTE)) {
             ha.setEstado(EstadoTurno.INICIADO);
             r = "firstTime";
         }
-
+        
         if (turnosFinalizados == turnos.size()) {
             ha.setClienteActual(0);
             ha.setEstado(EstadoTurno.FINALIZADO);
             r = "lastTime";
         }
-
+        
         if (Singleton.getInstance().merge(ha)) {
             if (!r.equals("firstTime") && !r.equals("lastTime")) {
                 r = "OK";
@@ -76,7 +80,7 @@ public class CEmpleado {
         }
         return r;
     }
-
+    
     public static boolean finalizarHA(String idHA) {
         HorarioAtencion ha = obtenerHorarioAtencion(Long.valueOf(idHA));
         List<Turno> turnos = ha.getTurnos();
@@ -85,6 +89,7 @@ public class CEmpleado {
         }
         ha.setTurnos(turnos);
         ha.setEstado(EstadoTurno.FINALIZADO);
+        ha.setClienteActual(0);
         return Singleton.getInstance().merge(ha);
     }
 }
