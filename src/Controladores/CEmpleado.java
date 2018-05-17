@@ -43,30 +43,6 @@ public class CEmpleado {
         return horarioAtencion;
     }
 
-   /* public static boolean setEstadoTurno(String idTurno, EstadoTurno estado) {
-        Turno turno = obtenerTurno(Long.valueOf(idTurno));
-        turno.setEstado(estado);
-        return Singleton.getInstance().merge(turno);
-    }*/
-
-    /*public static String setClienteActualHA(String idHa, int numeroActual) {
-        HorarioAtencion horarioAtencion = obtenerHorarioAtencion(Long.valueOf(idHa));
-        horarioAtencion.setClienteActual(numeroActual);
-        String r = "ERR";
-        if (horarioAtencion.getEstado().equals(EstadoTurno.PENDIENTE)) {
-            horarioAtencion.setEstado(EstadoTurno.INICIADO);
-            r = "firstTime";
-        }
-
-        if (Singleton.getInstance().merge(horarioAtencion)) {
-            if (!r.equals("firstTime")) {
-                r = "OK";
-            }
-        }
-
-        return r;
-    }*/
-
     public static String actualizarHA(String idHA, String idTurno, EstadoTurno estado) {
         HorarioAtencion ha = obtenerHorarioAtencion(Long.valueOf(idHA));
         List<Turno> turnos = ha.getTurnos();
