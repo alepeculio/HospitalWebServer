@@ -50,8 +50,6 @@ public class Cliente implements Serializable {
     @Expose
     private int numero;
     @Expose
-    private int piso;
-    @Expose
     private int apartamento;
     @Expose
     private int diaNacimiento;
@@ -167,14 +165,6 @@ public class Cliente implements Serializable {
 
     public void setNumero(int numero) {
         this.numero = numero;
-    }
-
-    public int getPiso() {
-        return piso;
-    }
-
-    public void setPiso(int piso) {
-        this.piso = piso;
     }
 
     public int getApartamento() {

@@ -127,8 +127,8 @@ public class CCliente {
 
     }
 
-    public static boolean altaCliente(Cliente cliente) {
-        return Singleton.getInstance().persist(cliente);
+    public static boolean altaCliente (Cliente cliente) {
+        return Singleton.getInstance().persist (cliente);
     }
 
     public static boolean bajaCliente(String idCliente) {
