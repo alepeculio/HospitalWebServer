@@ -64,6 +64,7 @@ public class CEmpleado {
         }
 
         if (turnosFinalizados == turnos.size()) {
+            ha.setClienteActual(0);
             ha.setEstado(EstadoTurno.FINALIZADO);
             r = "lastTime";
         }
