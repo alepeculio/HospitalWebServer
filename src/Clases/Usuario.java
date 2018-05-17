@@ -32,6 +32,10 @@ public class Usuario implements Serializable {
     @Expose
     private String correo;
 
+    public Usuario() {
+        this.contrasenia = "1"; //this.getContraseniaInicial();
+    }
+
     public long getId() {
         return id;
     }
