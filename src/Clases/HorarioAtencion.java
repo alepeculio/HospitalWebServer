@@ -51,6 +51,22 @@ public class HorarioAtencion implements Serializable {
     private int clientesMax;
     @Expose
     private int clienteActual;
+    
+    @Expose
+    private EstadoTurno estado;
+
+    
+    public HorarioAtencion (){
+        estado = EstadoTurno.PENDIENTE;
+    }
+    
+    public EstadoTurno getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoTurno estado) {
+        this.estado = estado;
+    }
 
     public Date getHoraInicio() {
         return horaInicio;
