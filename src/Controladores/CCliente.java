@@ -6,6 +6,9 @@
 package Controladores;
 
 import Clases.Cliente;
+import Clases.HorarioAtencion;
+import Clases.TipoTurno;
+import Clases.Turno;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
@@ -19,7 +22,6 @@ import java.util.List;
  * @author Jorge
  */
 public class CCliente {
-    
 
     public static List<Cliente> obtenerClientes() {
         List<Cliente> lista = null;
@@ -158,8 +160,25 @@ public class CCliente {
 
     }
 
-    public static void ReservarTurnoVacunacion() {
+    public static void ReservarTurnoVacunacion(long idCliente, long idHorario, long idHospital) {
+        List<HorarioAtencion> horarios = CHospital.obtenerHorariosHospital(idHospital);
+        HorarioAtencion horario = new HorarioAtencion();
+        for (HorarioAtencion h : horarios) {
+            if (h.getId().equals(idHorario)) {
+                horario = h;
+                break;
+            }
+        }
+        
+        List<Turno> turnos = CHospital.obtenerTurnosDeUnHorario(idHorario);
+        
+      }
 
+    public static Date calcular(int numero, Date hi, Date hf, int cant) {
+        long inc = (hf.getTime() - hi.getTime()) / cant;
+        Date res = (Date) hi.clone();
+        res.setTime(hi.getTime() + inc * numero);
+        return res;
     }
 
     public static void ModificarTurnoVacunacion(String[] args) {
@@ -172,13 +191,13 @@ public class CCliente {
 
     public static List<Cliente> edad(Cliente c, int edad, String en) {
         System.out.println("ok");
-        
+
         List<Cliente> hijos = c.getHijos();
-         
-        List<Cliente> hijosXedad = new ArrayList<>() ;
+
+        List<Cliente> hijosXedad = new ArrayList<>();
 
         for (Cliente hijo : hijos) {
-            
+
             String Nac = String.valueOf(hijo.getDiaNacimiento()) + "/" + String.valueOf(hijo.getMesNacimiento()) + "/" + String.valueOf(hijo.getAnioNacimiento());
             Date F = new Date();
             F.setYear(hijo.getAnioNacimiento() - 1900);
@@ -194,7 +213,7 @@ public class CCliente {
             if ("m".equals(en)) {
                 if (periodo.getMonths() == edad) {
                     hijosXedad.add(hijo);
-                } 
+                }
             } else {
                 if (periodo.getYears() == edad) {
                     hijosXedad.add(hijo);

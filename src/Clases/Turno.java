@@ -5,12 +5,15 @@
  */
 package Clases;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -32,7 +35,9 @@ public class Turno implements Serializable {
     private TipoTurno tipo;
     private int numero;
     private boolean finalizado;
-
+    @Expose
+    @Temporal(javax.persistence.TemporalType.TIME)
+    private Date horaEstimada;
     public Cliente getCliente() {
         return cliente;
     }
