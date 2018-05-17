@@ -47,20 +47,29 @@ public class CEmpleado {
         HorarioAtencion ha = obtenerHorarioAtencion(Long.valueOf(idHA));
         List<Turno> turnos = ha.getTurnos();
         String r = "ERR";
-
+        int turnosFinalizados = 0;
         for (Turno turno : turnos) {
             if (turno.getId() == Long.valueOf(idTurno)) {
                 turno.setEstado(estado);
                 ha.setClienteActual(turno.getNumero());
             }
+            if (turno.getEstado().equals(EstadoTurno.FINALIZADO)) {
+                turnosFinalizados++;
+            }
         }
+
         if (ha.getEstado().equals(EstadoTurno.PENDIENTE)) {
             ha.setEstado(EstadoTurno.INICIADO);
             r = "firstTime";
         }
 
+        if (turnosFinalizados == turnos.size()) {
+            ha.setEstado(EstadoTurno.FINALIZADO);
+            r = "lastTime";
+        }
+
         if (Singleton.getInstance().merge(ha)) {
-            if (!r.equals("firstTime")) {
+            if (!r.equals("firstTime") && !r.equals("lastTime")) {
                 r = "OK";
             }
         }
