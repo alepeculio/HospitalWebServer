@@ -35,7 +35,7 @@ public class Turno implements Serializable {
     private EstadoTurno estado;
 
     public Turno (){
-        estado = EstadoTurno.INGRESADO;
+        estado = EstadoTurno.PENDIENTE;
     }
 
     public EstadoTurno getEstado() {
