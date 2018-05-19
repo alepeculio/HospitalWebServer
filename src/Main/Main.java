@@ -10,12 +10,8 @@ import java.util.Date;
 public class Main {
 
     public static void main(String[] args) {
-//        Singleton.getInstance().getEntity().getTransaction();
-        
-        Date hi = new Date(2018, 5, 16, 12, 0);
-        Date hf = new Date(2018, 5, 16, 14, 0);
-        int cant = 2;
-        System.out.println(((hf.getTime() - hi.getTime()) / cant) / 1000 / 60);
+        Singleton.getInstance().getEntity().getTransaction();
+       // CCorreo.enviar ("alejandropeculio@gmail.com", "Prueba", "Testeando\nJejejejeje\nhttps://www.google.com/");
     }
 
 }
