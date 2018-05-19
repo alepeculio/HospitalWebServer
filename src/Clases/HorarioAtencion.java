@@ -48,6 +48,8 @@ public class HorarioAtencion implements Serializable {
     @Temporal(javax.persistence.TemporalType.TIME)
     private Date horaFin;
     @Expose
+    private TipoTurno tipo;
+    @Expose
     private int clientesMax;
     @Expose
     private int clienteActual;
@@ -55,6 +57,13 @@ public class HorarioAtencion implements Serializable {
     @Expose
     private EstadoTurno estado;
 
+    public TipoTurno getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoTurno tipo) {
+        this.tipo = tipo;
+    }
     
     public HorarioAtencion (){
         estado = EstadoTurno.PENDIENTE;

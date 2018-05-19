@@ -1,7 +1,7 @@
 package Main;
 
-import Controladores.CCorreo;
 import Controladores.Singleton;
+import java.util.Date;
 
 /**
  *
