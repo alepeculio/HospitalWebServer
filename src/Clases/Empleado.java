@@ -5,9 +5,13 @@
  */
 package Clases;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 /**
@@ -17,11 +21,19 @@ import javax.persistence.OneToMany;
 @Entity
 public class Empleado extends Cliente implements Serializable {
 
+    @Expose
     private String[] especialidades;
-    private String[] titulos;
+    @Expose
     private String tipo;
-    @OneToMany(mappedBy = "empleado")
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<HorarioAtencion> horariosAtencions;
+    
+    public void agregarHA (HorarioAtencion ha) {
+        if (horariosAtencions == null)
+            horariosAtencions = new ArrayList<>();
+        
+        horariosAtencions.add (ha);
+    }
 
     public String[] getEspecialidades() {
         return especialidades;
@@ -29,14 +41,6 @@ public class Empleado extends Cliente implements Serializable {
 
     public void setEspecialidades(String[] especialidades) {
         this.especialidades = especialidades;
-    }
-
-    public String[] getTitulos() {
-        return titulos;
-    }
-
-    public void setTitulos(String[] titulos) {
-        this.titulos = titulos;
     }
 
     public String getTipo() {
@@ -54,6 +58,5 @@ public class Empleado extends Cliente implements Serializable {
     public void setHorariosAtencions(List<HorarioAtencion> horariosAtencions) {
         this.horariosAtencions = horariosAtencions;
     }
-    
-    
+
 }

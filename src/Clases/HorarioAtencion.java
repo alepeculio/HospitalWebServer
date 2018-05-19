@@ -5,9 +5,11 @@
  */
 package Clases;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,10 +25,10 @@ import javax.persistence.Temporal;
 @Entity
 public class HorarioAtencion implements Serializable {
 
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.ALL)
     private Empleado empleado;
 
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.ALL)
     private Hospital hospital;
 
     @OneToMany(mappedBy = "horarioAtencion")
@@ -35,14 +37,45 @@ public class HorarioAtencion implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Expose
     private Long id;
+    @Expose
     private String dia;
+    @Expose
     @Temporal(javax.persistence.TemporalType.TIME)
     private Date horaInicio;
+    @Expose
     @Temporal(javax.persistence.TemporalType.TIME)
     private Date horaFin;
+    @Expose
+    private TipoTurno tipo;
+    @Expose
     private int clientesMax;
+    @Expose
     private int clienteActual;
+    
+    @Expose
+    private EstadoTurno estado;
+
+    public TipoTurno getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoTurno tipo) {
+        this.tipo = tipo;
+    }
+    
+    public HorarioAtencion (){
+        estado = EstadoTurno.PENDIENTE;
+    }
+    
+    public EstadoTurno getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoTurno estado) {
+        this.estado = estado;
+    }
 
     public Date getHoraInicio() {
         return horaInicio;

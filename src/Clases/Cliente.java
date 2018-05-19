@@ -5,10 +5,12 @@
  */
 package Clases;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +19,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import com.google.gson.Gson;
+import com.google.gson.annotations.Expose;
 
 /**
  *
@@ -29,29 +33,51 @@ public class Cliente implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Expose
     private long id;
+    @Expose
     private String nombre;
+    @Expose
     private String apellido;
+    @Expose
     private String[] telefonos;
+    @Expose
     private String calle;
+    @Expose
     private String departamento;
+    @Expose
     private String ciudad;
+    @Expose
     private int numero;
-    private int piso;
+    @Expose
     private int apartamento;
+    @Expose
     private int diaNacimiento;
+    @Expose
     private int mesNacimiento;
+    @Expose
     private int anioNacimiento;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Cliente> hijos;
-    @OneToOne(cascade = CascadeType.ALL)
+    @Expose
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Usuario usuario;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Vacunacion> vacunacion;
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Turno> turnos;
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     List<Suscripcion> suscripciones;
+    @Expose
+    private boolean activo = true;
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
 
     public long getId() {
         return id;
@@ -139,14 +165,6 @@ public class Cliente implements Serializable {
 
     public void setNumero(int numero) {
         this.numero = numero;
-    }
-
-    public int getPiso() {
-        return piso;
-    }
-
-    public void setPiso(int piso) {
-        this.piso = piso;
     }
 
     public int getApartamento() {

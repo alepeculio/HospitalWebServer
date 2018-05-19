@@ -24,6 +24,7 @@ import javax.persistence.OneToOne;
  */
 @Entity
 public class Hospital implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -45,7 +46,7 @@ public class Hospital implements Serializable {
     private List<Suscripcion> suscripciones;
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Administrador> administradores;
-    @OneToMany(mappedBy = "hospital")
+    @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorarioAtencion> horarioAtencions;
 
     public List<HorarioAtencion> getHorarioAtencions() {
@@ -77,6 +78,7 @@ public class Hospital implements Serializable {
         
         for (int i = 0; i < administradores.size (); i++)
             if (administradores.get (i).getUsuario ().getCi ().equals (ciAdmin)) {
+                administradores.get (i).setHospital (null);
                 administradores.remove (i);
                 return;
             }
@@ -93,6 +95,14 @@ public class Hospital implements Serializable {
 
     public String getDirectora() {
         return directora;
+    }
+    
+    public void agregarHA(HorarioAtencion ha) {
+        if (horarioAtencions == null) {
+            horarioAtencions = new ArrayList<>();
+        }
+
+        horarioAtencions.add(ha);
     }
 
     public void setDirectora(String directora) {

@@ -29,6 +29,12 @@ public class Suscripcion implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    private int diaContratada;
+    private int mesContratada;
+    private int anioContratada;
+    private int diaVencimiento;
+    private int mesVencimiento;
+    private int anioVencimiento;
 
     public Hospital getHospital() {
         return hospital;
@@ -45,12 +51,6 @@ public class Suscripcion implements Serializable {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
-    private int diaContratada;
-    private int mesContratada;
-    private int anioContratada;
-    private int diaVencimiento;
-    private int mesVencimiento;
-    private int anioVencimiento;
 
     public int getDiaContratada() {
         return diaContratada;

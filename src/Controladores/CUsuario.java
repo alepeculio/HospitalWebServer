@@ -8,11 +8,8 @@ package Controladores;
 import Clases.Administrador;
 import Clases.Cliente;
 import Clases.Empleado;
-import Clases.HorarioAtencion;
-import Clases.Suscripcion;
-import Clases.Turno;
 import Clases.Usuario;
-import Clases.Vacunacion;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 
@@ -23,9 +20,30 @@ import javax.persistence.EntityManager;
 public class CUsuario {
 
     Singleton s = Singleton.getInstance();
+    
+    public static boolean cambiarPass (long idUsuario, String nuevaPass) {
+        EntityManager em = Singleton.getInstance ().getEntity();
+        em.getTransaction().begin();
+        try {
+            em.createNativeQuery("UPDATE usuario SET contrasenia = :contrasenia WHERE id = :id")
+                    .setParameter("id", idUsuario)
+                    .setParameter("contrasenia", nuevaPass)
+                    .executeUpdate ();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace ();
+            System.out.println("No se pudo cambiar pass");
+            return false;
+        }
+        return true;
+    }
 
     public static String obtenerTipo(Usuario u) {
         List<Administrador> admins = CAdministradores.obtenerAdministradores();
+        List<Cliente> soloClientes = CCliente.obtenerClientesNoEmpleados();
 
         if (admins != null) {
             for (Administrador a : admins) {
@@ -39,7 +57,15 @@ public class CUsuario {
             }
         }
 
-        return "Cliente";
+        if (soloClientes != null) {
+            for (Cliente c : soloClientes) {
+                if (c.getUsuario() == u) {
+                    return "Cliente";
+                }
+            }
+        }
+
+        return "Empleado";
     }
 
     public Usuario login(String ci, String contrasenia) {
@@ -54,14 +80,21 @@ public class CUsuario {
                     .getSingleResult();
             em.getTransaction().commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             System.out.println("No se encontró el usuario");
-
+        }
+        if (u != null) {
+            Cliente cliente = CCliente.getClientebyUsuario(u.getId());
+            if (cliente != null && !cliente.isActivo()) {
+                u = null;
+            }
         }
         return u;
     }
 
-    public Empleado getEmpleado(long id) {
+    public Empleado getEmpleadobyUsuario(long id) {
         EntityManager em = s.getEntity();
 
         Empleado empleado = null;
@@ -71,10 +104,79 @@ public class CUsuario {
                     .getSingleResult();
             em.getTransaction().commit();
         } catch (Exception e) {
-            em.getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+
+            e.printStackTrace();
+
             System.err.println("No se puedo encontrar el empleado relacionado al usuario con id: " + id);
         }
         return empleado;
     }
 
+    public static Empleado getEmpleado(long id) {
+        Empleado empleado = null;
+        try {
+            Singleton.getInstance().getEntity().getTransaction().begin();
+            empleado = (Empleado) Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE id=" + id, Empleado.class)
+                    .getSingleResult();
+            Singleton.getInstance().getEntity().getTransaction().commit();
+        } catch (Exception e) {
+            Singleton.getInstance().getEntity().getTransaction().rollback();
+            System.err.println("No se puedo encontrar el empleado con id: " + id);
+        }
+        return empleado;
+    }
+
+    public static List<Empleado> obtenerEmpleados() {
+        List<Empleado> lista = null;
+
+        try {
+            if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
+                Singleton.getInstance().getEntity().getTransaction().begin();
+            }
+            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE DTYPE = 'Empleado' AND activo = 1", Empleado.class)
+                    .getResultList();
+            Singleton.getInstance().getEntity().getTransaction().commit();
+        } catch (Exception e) {
+            if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
+                Singleton.getInstance().getEntity().getTransaction().rollback();
+            }
+        }
+
+        if (lista != null) {
+            return lista;
+        }
+        return new ArrayList<>();
+    }
+
+    public boolean bajaEmpleado(String idEmpleado) {
+        Empleado empleado = getEmpleado(Long.valueOf(idEmpleado));
+        empleado.setActivo(false);
+        return s.merge(empleado);
+    }
+
+    public boolean cedulaExiste(String cedula) {
+        EntityManager em = s.getEntity();
+
+        Usuario u = null;
+
+        try {
+            if (!em.getTransaction().isActive()) {
+                em.getTransaction().begin();
+            }
+            u = (Usuario) em.createQuery("FROM Usuario U WHERE U.ci= :cedula", Usuario.class)
+                    .setParameter("cedula", cedula)
+                    .getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("Error en la transaccion, usuario con cedula: " + cedula);
+        }
+        return u != null;
+
+    }
 }
