@@ -6,6 +6,7 @@
 package Controladores;
 
 import Clases.Cliente;
+import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.TipoTurno;
 import Clases.Turno;
@@ -160,7 +161,8 @@ public class CCliente {
 
     }
 
-    public static void ReservarTurnoVacunacion(long idCliente, long idHorario, long idHospital) {
+    public static Object[] ReservarTurnoVacunacion(String cliente, long idHorario, long idHospital) {
+        Cliente c = obtenerCliente(cliente);
         List<HorarioAtencion> horarios = CHospital.obtenerHorariosHospital(idHospital);
         HorarioAtencion horario = new HorarioAtencion();
         for (HorarioAtencion h : horarios) {
@@ -169,10 +171,33 @@ public class CCliente {
                 break;
             }
         }
-        
+
         List<Turno> turnos = CHospital.obtenerTurnosDeUnHorario(idHorario);
-        
-      }
+        Turno turno = new Turno();
+        if (turnos.isEmpty()) {
+            turno.setCliente(c);
+            turno.setEstado(EstadoTurno.PENDIENTE);
+            turno.setHorarioAtencion(horario);
+            turno.setNumero(1);
+            turno.setTipo(TipoTurno.VACUNACION);
+            turno.setHora(horario.getHoraInicio());
+            Singleton.getInstance().persist(turno);
+
+        } else {
+            Date hora = calcular(turnos.size(), horario.getHoraInicio(), horario.getHoraFin(), horario.getClientesMax());
+            turno.setCliente(c);
+            turno.setEstado(EstadoTurno.PENDIENTE);
+            turno.setHorarioAtencion(horario);
+            turno.setNumero(turnos.size() + 1);
+            turno.setTipo(TipoTurno.VACUNACION);
+            turno.setHora(hora);
+            Singleton.getInstance().persist(turno);
+
+        }
+        Object[] result = new Object[]{c.getNombre(), c.getApellido(), horario.getEmpleado().getNombre(), horario.getEmpleado().getApellido(), turno.getHora()};
+        return result;
+
+    }
 
     public static Date calcular(int numero, Date hi, Date hf, int cant) {
         long inc = (hf.getTime() - hi.getTime()) / cant;

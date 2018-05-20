@@ -21,10 +21,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class Empleado extends Cliente implements Serializable {
 
-    @OneToMany(mappedBy = "empleado")
-    private List<Hospital> hospitals;    
+    @Expose
     private String[] especialidades;
-    private String[] titulos;
     @Expose
     private String tipo;
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -43,14 +41,6 @@ public class Empleado extends Cliente implements Serializable {
 
     public void setEspecialidades(String[] especialidades) {
         this.especialidades = especialidades;
-    }
-
-    public String[] getTitulos() {
-        return titulos;
-    }
-
-    public void setTitulos(String[] titulos) {
-        this.titulos = titulos;
     }
 
     public String getTipo() {

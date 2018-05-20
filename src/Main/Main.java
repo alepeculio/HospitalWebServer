@@ -18,18 +18,11 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        List<HorarioAtencion> horarios = CHospital.obtenerHorariosHospital(1);
-        HorarioAtencion horario = new HorarioAtencion();
-        for (HorarioAtencion h : horarios) {
-            System.out.println(h.getId());
-            if (h.getId() == 1) {
-                horario = h;
-                break;
-            }
-        }
+
 
 
         Singleton.getInstance().getEntity().getTransaction();
+       // CCorreo.enviar ("alejandropeculio@gmail.com", "Prueba", "Testeando\nJejejejeje\nhttps://www.google.com/");
     }
 
 

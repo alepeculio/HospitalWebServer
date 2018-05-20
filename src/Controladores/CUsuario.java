@@ -20,6 +20,26 @@ import javax.persistence.EntityManager;
 public class CUsuario {
 
     Singleton s = Singleton.getInstance();
+    
+    public static boolean cambiarPass (long idUsuario, String nuevaPass) {
+        EntityManager em = Singleton.getInstance ().getEntity();
+        em.getTransaction().begin();
+        try {
+            em.createNativeQuery("UPDATE usuario SET contrasenia = :contrasenia WHERE id = :id")
+                    .setParameter("id", idUsuario)
+                    .setParameter("contrasenia", nuevaPass)
+                    .executeUpdate ();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace ();
+            System.out.println("No se pudo cambiar pass");
+            return false;
+        }
+        return true;
+    }
 
     public static String obtenerTipo(Usuario u) {
         List<Administrador> admins = CAdministradores.obtenerAdministradores();
@@ -137,29 +157,6 @@ public class CUsuario {
         return s.merge(empleado);
     }
 
-    public boolean correoExiste(String correo) {
-        EntityManager em = s.getEntity();
-
-        Usuario u = null;
-
-        try {
-            if (!em.getTransaction().isActive()) {
-                em.getTransaction().begin();
-            }
-            u = (Usuario) em.createQuery("SELECT u FROM Usuario u WHERE correo= :c", Usuario.class)
-                    .setParameter("c", correo)
-                    .getSingleResult();
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            System.out.println("Error en la transaccion, usuario con correo: " + correo);
-        }
-        return u != null;
-
-    }
-
     public boolean cedulaExiste(String cedula) {
         EntityManager em = s.getEntity();
 
@@ -169,7 +166,7 @@ public class CUsuario {
             if (!em.getTransaction().isActive()) {
                 em.getTransaction().begin();
             }
-            u = (Usuario) em.createQuery("SELECT u FROM Usuario u WHERE ci= :cedula", Usuario.class)
+            u = (Usuario) em.createQuery("FROM Usuario U WHERE U.ci= :cedula", Usuario.class)
                     .setParameter("cedula", cedula)
                     .getSingleResult();
             em.getTransaction().commit();

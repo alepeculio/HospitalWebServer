@@ -191,6 +191,19 @@ public class CHospital {
         }
         return lista;
     }
+    public static List<HorarioAtencion> obtenerHorariosConTurnosDisp(long idHospital) {
+        List<HorarioAtencion> Todos = obtenerHorariosHospital(idHospital);
+        List<HorarioAtencion> fin = new ArrayList<>();
+       
+        for(HorarioAtencion ha : Todos){
+            if(ha.getClientesMax() != ha.getTurnos().size()) 
+            {
+            fin.add(ha);
+        }
+    
+    }
+        return fin;
+    }
 
     public static List<Turno> obtenerTurnosDeUnHorario(long idHorario) {
         EntityManager em = Singleton.getInstance().getEntity();

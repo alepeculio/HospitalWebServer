@@ -64,9 +64,6 @@ public class Hospital implements Serializable {
         this.empleados = empleados;
     }
 
-
-
-
     public List<HorarioAtencion> getHorarioAtencions() {
         return horarioAtencions;
     }
@@ -95,9 +92,9 @@ public class Hospital implements Serializable {
         if (administradores == null) {
             return;
         }
-
         for (int i = 0; i < administradores.size(); i++) {
             if (administradores.get(i).getUsuario().getCi().equals(ciAdmin)) {
+                administradores.get(i).setHospital(null);
                 administradores.remove(i);
                 return;
             }
@@ -115,7 +112,7 @@ public class Hospital implements Serializable {
     public String getDirectora() {
         return directora;
     }
-    
+
     public void agregarHA(HorarioAtencion ha) {
         if (horarioAtencions == null) {
             horarioAtencions = new ArrayList<>();
@@ -143,8 +140,6 @@ public class Hospital implements Serializable {
     public void setCorreo(String correo) {
         this.correo = correo;
     }
-    
-    
 
     public void setSuscripciones(List<Suscripcion> suscripciones) {
         this.suscripciones = suscripciones;

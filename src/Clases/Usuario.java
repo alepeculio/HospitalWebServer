@@ -5,6 +5,7 @@
  */
 package Clases;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.Random;
 import javax.persistence.Entity;
@@ -22,10 +23,18 @@ public class Usuario implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Expose
     private Long id;
+    @Expose
     private String ci;
+    @Expose
     private String contrasenia = this.getContraseniaInicial();
+    @Expose
     private String correo;
+
+    public Usuario() {
+        this.contrasenia = "1"; //this.getContraseniaInicial();
+    }
 
     public long getId() {
         return id;

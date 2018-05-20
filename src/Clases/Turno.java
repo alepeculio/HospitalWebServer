@@ -34,10 +34,31 @@ public class Turno implements Serializable {
     private long id;
     private TipoTurno tipo;
     private int numero;
-    private boolean finalizado;
-    @Expose
+    private EstadoTurno estado;
+    
     @Temporal(javax.persistence.TemporalType.TIME)
-    private Date horaEstimada;
+    private Date hora;
+
+    public Date getHora() {
+        return hora;
+    }
+
+    public void setHora(Date hora) {
+        this.hora = hora;
+    }
+
+    public Turno (){
+        estado = EstadoTurno.PENDIENTE;
+    }
+
+    public EstadoTurno getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoTurno estado) {
+        this.estado = estado;
+    }
+    
     public Cliente getCliente() {
         return cliente;
     }
@@ -52,6 +73,7 @@ public class Turno implements Serializable {
 
     public void setHorarioAtencion(HorarioAtencion horarioAtencion) {
         this.horarioAtencion = horarioAtencion;
+
     }
 
     public TipoTurno getTipo() {
@@ -68,14 +90,6 @@ public class Turno implements Serializable {
 
     public void setNumero(int numero) {
         this.numero = numero;
-    }
-
-    public boolean isFinalizado() {
-        return finalizado;
-    }
-
-    public void setFinalizado(boolean finalizado) {
-        this.finalizado = finalizado;
     }
 
     public long getId() {
