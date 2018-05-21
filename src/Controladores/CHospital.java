@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Controladores;
 
 import Clases.Administrador;
@@ -188,6 +183,55 @@ public class CHospital {
         }
 
         return null;
+    }
+
+    public static List<HorarioAtencion> obtenerHorariosHospital(long idHospital) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        List<HorarioAtencion> lista = new ArrayList<>();
+        try {
+            lista = (List<HorarioAtencion>) em.createNativeQuery("SELECT ha.* FROM horarioatencion AS ha,hospital AS h WHERE ha.hospital_id=h.id AND h.id =:idHospital", HorarioAtencion.class)
+                    .setParameter("idHospital", idHospital)
+                    .getResultList();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se encontraron los horairos de atencion");
+        }
+        return lista;
+    }
+
+    public static List<HorarioAtencion> obtenerHorariosConTurnosDisp(long idHospital) {
+        List<HorarioAtencion> Todos = obtenerHorariosHospital(idHospital);
+        List<HorarioAtencion> fin = new ArrayList<>();
+
+        for (HorarioAtencion ha : Todos) {
+            if (ha.getClientesMax() != ha.getTurnos().size()) {
+                fin.add(ha);
+            }
+
+        }
+        return fin;
+    }
+
+    public static List<Turno> obtenerTurnosDeUnHorario(long idHorario) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        List<Turno> lista = new ArrayList<>();
+        try {
+            lista = (List<Turno>) em.createNativeQuery("SELECT * FROM turno  WHERE horarioAtencion_id=:idHorario", Turno.class)
+                    .setParameter("idHorario", idHorario)
+                    .getResultList();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se encontraron los turnos ");
+        }
+        return lista;
     }
 
     public static List<Hospital> obtenerHospitales() {
