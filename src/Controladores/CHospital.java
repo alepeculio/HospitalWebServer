@@ -3,12 +3,23 @@ package Controladores;
 import Clases.Administrador;
 import Clases.Cliente;
 import Clases.Empleado;
+import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.Hospital;
+import Clases.TipoTurno;
 import Clases.Turno;
 import Clases.Usuario;
+import java.text.DateFormat;
+import java.text.Format;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 
 /**
@@ -230,8 +241,101 @@ public class CHospital {
             lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM hospital", Hospital.class).getResultList();
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
-            Singleton.getInstance().getEntity().getTransaction().rollback();
+
+            if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
+                Singleton.getInstance().getEntity().getTransaction().rollback();
+            }
+
         }
         return lista;
+    }
+
+    public static String agregarTurno(String hospital, long idUsuario, String dia) {
+        Hospital h = obtenerHospital(hospital);
+        List<HorarioAtencion> ha = h.getHorarioAtencions();
+        List<String> horarios = new ArrayList<>();
+        List<Turno> turnosDia = new ArrayList<>();
+
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(dia);
+        } catch (ParseException ex) {
+            Logger.getLogger(CHospital.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Locale spanishLocale = new Locale("es", "ES");
+        String dayOfWeek = new SimpleDateFormat("EEEE", spanishLocale).format(date);
+
+        for (HorarioAtencion hs : ha) {
+
+            //aca estaban los horarios
+            if (hs.getDia().toLowerCase().equals(dayOfWeek)) {
+
+                List<Turno> turnos = hs.getTurnos();
+                Cliente c = CCliente.getClientebyUsuario(idUsuario);
+                Turno t = new Turno();
+                String[] array = dia.split("-");
+                Date d = new Date(Integer.valueOf(array[0]), Integer.valueOf(array[1]), Integer.valueOf(array[2]));
+                Format f = new SimpleDateFormat("MMMM");
+                String mes = f.format(d);
+                //para horarios
+                DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+
+                if (turnos.size() == hs.getClientesMax()) {
+                    return "NOPE";
+                } else if (turnos.isEmpty()) {
+
+                    t.setCliente(c);
+                    t.setEstado(EstadoTurno.PENDIENTE);
+                    t.setHorarioAtencion(hs);
+                    t.setNumero(1);
+                    t.setFecha(d);
+                    t.setTipo(TipoTurno.ATENCION);
+                    hs.agregarTurno(t);
+                    c.agregarTurno(t);
+                    //Singleton.getInstance().persist(t);
+                    //Singleton.getInstance().merge(hs);
+                    //Singleton.getInstance().merge(c);
+
+                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + dateFormat.format(hs.getHoraInicio()) + "hs";
+                } else {
+
+                    for (Turno ts : turnos) {
+                        if (ts.getCliente().getId() == c.getId() && ts.getFecha().compareTo(d) == 0 && hs.getTipo() == TipoTurno.ATENCION) {
+                            return "Usted ya posee un turno para ese día.";
+                        }
+
+                        if (ts.getFecha().compareTo(d) == 0) {
+                            turnosDia.add(ts);
+                        }
+                    }
+
+                    //obtener la hora del turno
+                    for (int i = 0; i < hs.getClientesMax(); i++) {
+                        Date hi = hs.getHoraInicio();
+                        Date hf = hs.getHoraFin();
+                        Date hsss = Date.from(Instant.ofEpochMilli(hi.getTime() + ((hf.getTime() - hi.getTime()) / hs.getClientesMax()) * i));
+
+                        horarios.add(dateFormat.format(hsss));
+
+                    }//fin de horarios
+
+                    t.setCliente(c);
+                    t.setEstado(EstadoTurno.PENDIENTE);
+                    t.setHorarioAtencion(hs);
+                    t.setFecha(d);
+                    t.setNumero(turnosDia.size() + 1);
+                    t.setTipo(TipoTurno.ATENCION);
+                    hs.agregarTurno(t);
+                    c.agregarTurno(t);
+                    //Singleton.getInstance().persist(t);
+                    //Singleton.getInstance().merge(hs);
+                    //Singleton.getInstance().merge(c);
+                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + horarios.get(t.getNumero() - 1) + "hs";
+
+                }
+            }
+
+        }
+        return "";
     }
 }
