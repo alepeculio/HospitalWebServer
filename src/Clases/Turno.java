@@ -46,8 +46,17 @@ public class Turno implements Serializable {
     public void setHora(Date hora) {
         this.hora = hora;
     }
+    private Date fecha;
 
-    public Turno (){
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
+    }
+
+    public Turno() {
         estado = EstadoTurno.PENDIENTE;
     }
 
@@ -58,7 +67,7 @@ public class Turno implements Serializable {
     public void setEstado(EstadoTurno estado) {
         this.estado = estado;
     }
-    
+
     public Cliente getCliente() {
         return cliente;
     }
@@ -73,7 +82,6 @@ public class Turno implements Serializable {
 
     public void setHorarioAtencion(HorarioAtencion horarioAtencion) {
         this.horarioAtencion = horarioAtencion;
-
     }
 
     public TipoTurno getTipo() {
