@@ -3,11 +3,15 @@ package Controladores;
 import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.Turno;
-import java.time.LocalDateTime;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.List;
 
 public class CEmpleado {
+
     /*
     public static Turno obtenerTurno(long id) {
         Turno turno = null;
@@ -26,8 +30,7 @@ public class CEmpleado {
         }
         return turno;
     }
-    */
-
+     */
     public static HorarioAtencion obtenerHorarioAtencion(long id) {
         HorarioAtencion horarioAtencion = null;
         try {
@@ -50,6 +53,9 @@ public class CEmpleado {
         HorarioAtencion ha = obtenerHorarioAtencion(Long.valueOf(idHA));
         List<Turno> turnos = ha.getTurnos();
         String r = "ERR";
+
+
+        /*
 
         if (ha.getEstado().equals(EstadoTurno.PENDIENTE)) {
             if (!ha.getDia().equals(obtenerDiaActual())) {
@@ -83,7 +89,7 @@ public class CEmpleado {
             if ("ERR".equals(r)) {
                 r = "OK";
             }
-        }
+        }*/
         return r;
     }
 
@@ -127,4 +133,38 @@ public class CEmpleado {
         }
         return diaString;
     }
+
+    public static void obtenerSiguienteDia(String dia) {
+        LocalDate ld = LocalDate.of(2018, 5, 21);
+
+         ld = ld.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+       
+        switch (dia) {
+            case "Lunes":
+
+                break;
+            case "Martes":
+
+                break;
+            case "Miercoles":
+
+                break;
+            case "Jueves":
+
+                break;
+            case "Viernes":
+
+                break;
+            case "Sabado":
+
+                break;
+            case "Domingo":
+
+                break;
+            default:
+
+                break;
+        }
+    }
+
 }
