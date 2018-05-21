@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public class CEmpleado {
-
+    /*
     public static Turno obtenerTurno(long id) {
         Turno turno = null;
         try {
@@ -26,6 +26,7 @@ public class CEmpleado {
         }
         return turno;
     }
+    */
 
     public static HorarioAtencion obtenerHorarioAtencion(long id) {
         HorarioAtencion horarioAtencion = null;
@@ -51,32 +52,7 @@ public class CEmpleado {
         String r = "ERR";
 
         if (ha.getEstado().equals(EstadoTurno.PENDIENTE)) {
-            int dia = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-            String diaString = "";
-            switch (dia) {
-                case Calendar.MONDAY:
-                    diaString = "Lunes";
-                    break;
-                case Calendar.TUESDAY:
-                    diaString = "Martes";
-                    break;
-                case Calendar.WEDNESDAY:
-                    diaString = "Miercoles";
-                    break;
-                case Calendar.THURSDAY:
-                    diaString = "Jueves";
-                    break;
-                case Calendar.FRIDAY:
-                    diaString = "Viernes";
-                    break;
-                case Calendar.SATURDAY:
-                    diaString = "Sabado";
-                    break;
-                case Calendar.SUNDAY:
-                    diaString = "Domingo";
-                    break;
-            }
-            if (!ha.getDia().equals(diaString)) {
+            if (!ha.getDia().equals(obtenerDiaActual())) {
                 return "errDia";
             }
             ha.setEstado(EstadoTurno.INICIADO);
@@ -87,10 +63,10 @@ public class CEmpleado {
         for (Turno turno : turnos) {
             if (turno.getId() == Long.valueOf(idTurno)) {
                 turno.setEstado(estado);
-                if (estado == EstadoTurno.FINALIZADO) {
-                    ha.setClienteActual(0);
-                } else {
+                if (estado == EstadoTurno.INICIADO) {
                     ha.setClienteActual(turno.getNumero());
+                } else {
+                    ha.setClienteActual(0);
                 }
             }
             if (turno.getEstado() == EstadoTurno.FINALIZADO) {
@@ -121,5 +97,34 @@ public class CEmpleado {
         ha.setEstado(EstadoTurno.FINALIZADO);
         ha.setClienteActual(0);
         return Singleton.getInstance().merge(ha);
+    }
+
+    public static String obtenerDiaActual() {
+        int dia = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        String diaString = "";
+        switch (dia) {
+            case Calendar.MONDAY:
+                diaString = "Lunes";
+                break;
+            case Calendar.TUESDAY:
+                diaString = "Martes";
+                break;
+            case Calendar.WEDNESDAY:
+                diaString = "Miercoles";
+                break;
+            case Calendar.THURSDAY:
+                diaString = "Jueves";
+                break;
+            case Calendar.FRIDAY:
+                diaString = "Viernes";
+                break;
+            case Calendar.SATURDAY:
+                diaString = "Sabado";
+                break;
+            case Calendar.SUNDAY:
+                diaString = "Domingo";
+                break;
+        }
+        return diaString;
     }
 }
