@@ -79,6 +79,8 @@ public class Cliente implements Serializable {
         this.activo = activo;
     }
 
+
+
     public long getId() {
         return id;
     }
