@@ -191,17 +191,17 @@ public class CHospital {
         }
         return lista;
     }
+
     public static List<HorarioAtencion> obtenerHorariosConTurnosDisp(long idHospital) {
         List<HorarioAtencion> Todos = obtenerHorariosHospital(idHospital);
         List<HorarioAtencion> fin = new ArrayList<>();
-       
-        for(HorarioAtencion ha : Todos){
-            if(ha.getClientesMax() != ha.getTurnos().size()) 
-            {
-            fin.add(ha);
+
+        for (HorarioAtencion ha : Todos) {
+            if (ha.getClientesMax() != ha.getTurnos().size()) {
+                fin.add(ha);
+            }
+
         }
-    
-    }
         return fin;
     }
 
