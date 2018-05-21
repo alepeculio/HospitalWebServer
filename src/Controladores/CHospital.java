@@ -197,7 +197,7 @@ public class CHospital {
         List<HorarioAtencion> fin = new ArrayList<>();
 
         for (HorarioAtencion ha : Todos) {
-            if (ha.getClientesMax() != ha.getTurnos().size()) {
+            if (ha.getClientesMax() > ha.getTurnos().size()) {
                 fin.add(ha);
             }
 

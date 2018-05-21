@@ -171,8 +171,9 @@ public class CCliente {
                 break;
             }
         }
-
+        
         List<Turno> turnos = CHospital.obtenerTurnosDeUnHorario(idHorario);
+        
         Turno turno = new Turno();
         if (turnos.isEmpty()) {
             turno.setCliente(c);
