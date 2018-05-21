@@ -7,6 +7,7 @@ package Clases;
 
 import com.google.gson.annotations.Expose;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -25,10 +26,10 @@ import javax.persistence.Temporal;
 @Entity
 public class HorarioAtencion implements Serializable {
 
-    @ManyToOne (cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Empleado empleado;
 
-    @ManyToOne (cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Hospital hospital;
 
     @OneToMany(mappedBy = "horarioAtencion")
@@ -53,7 +54,7 @@ public class HorarioAtencion implements Serializable {
     private int clientesMax;
     @Expose
     private int clienteActual;
-    
+
     @Expose
     private EstadoTurno estado;
 
@@ -64,11 +65,11 @@ public class HorarioAtencion implements Serializable {
     public void setTipo(TipoTurno tipo) {
         this.tipo = tipo;
     }
-    
-    public HorarioAtencion (){
+
+    public HorarioAtencion() {
         estado = EstadoTurno.PENDIENTE;
     }
-    
+
     public EstadoTurno getEstado() {
         return estado;
     }
@@ -147,6 +148,14 @@ public class HorarioAtencion implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void agregarTurno(Turno h) {
+        if (turnos == null) {
+            turnos = new ArrayList<>();
+        }
+
+        turnos.add(h);
     }
 
     @Override

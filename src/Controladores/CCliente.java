@@ -14,7 +14,6 @@ import java.util.List;
  * @author Jorge
  */
 public class CCliente {
-    
 
     public static List<Cliente> obtenerClientes() {
         List<Cliente> lista = null;
@@ -114,7 +113,7 @@ public class CCliente {
         }
         return cliente;
     }
-    
+
     public static boolean vincularHijoCliente(String idHijo, String idPadre) {
         Cliente padre = getCliente(Long.valueOf(idPadre));
         Cliente hijo = getCliente(Long.valueOf(idHijo));
@@ -127,8 +126,8 @@ public class CCliente {
 
     }
 
-    public static boolean altaCliente (Cliente cliente) {
-        return Singleton.getInstance().persist (cliente);
+    public static boolean altaCliente(Cliente cliente) {
+        return Singleton.getInstance().persist(cliente);
     }
 
     public static boolean bajaCliente(String idCliente) {

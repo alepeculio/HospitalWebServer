@@ -6,12 +6,12 @@
 package Clases;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-
 
 /**
  *
@@ -33,8 +33,17 @@ public class Turno implements Serializable {
     private TipoTurno tipo;
     private int numero;
     private EstadoTurno estado;
+    private Date fecha;
 
-    public Turno (){
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
+    }
+
+    public Turno() {
         estado = EstadoTurno.PENDIENTE;
     }
 
@@ -45,7 +54,7 @@ public class Turno implements Serializable {
     public void setEstado(EstadoTurno estado) {
         this.estado = estado;
     }
-    
+
     public Cliente getCliente() {
         return cliente;
     }
@@ -60,8 +69,8 @@ public class Turno implements Serializable {
 
     public void setHorarioAtencion(HorarioAtencion horarioAtencion) {
         this.horarioAtencion = horarioAtencion;
-    }   
-    
+    }
+
     public TipoTurno getTipo() {
         return tipo;
     }
@@ -77,7 +86,7 @@ public class Turno implements Serializable {
     public void setNumero(int numero) {
         this.numero = numero;
     }
-    
+
     public long getId() {
         return id;
     }
@@ -110,5 +119,5 @@ public class Turno implements Serializable {
     public String toString() {
         return "Logica.Turno[ id=" + id + " ]";
     }
-    
+
 }
