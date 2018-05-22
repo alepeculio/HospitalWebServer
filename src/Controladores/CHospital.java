@@ -236,7 +236,10 @@ public class CHospital {
 
     public static List<Hospital> obtenerHospitales() {
         List<Hospital> lista = null;
-        Singleton.getInstance().getEntity().getTransaction().begin();
+        if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
+            Singleton.getInstance().getEntity().getTransaction().begin();
+        }
+
         try {
             lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM hospital", Hospital.class).getResultList();
             Singleton.getInstance().getEntity().getTransaction().commit();
@@ -337,5 +340,28 @@ public class CHospital {
 
         }
         return "";
+    }
+
+    public static String ObtenerHorariosPedidos(String hospital, long idUsuario) {
+        Hospital h = obtenerHospital(hospital);
+        Cliente c = CCliente.getClientebyUsuario(idUsuario);
+        List<HorarioAtencion> ha = h.getHorarioAtencions();
+        String resultado = "";
+
+        for (HorarioAtencion hs : ha) {
+            if (hs.getTipo() == TipoTurno.ATENCION) {
+                List<Turno> turnos = hs.getTurnos();
+
+                for (Turno t : turnos) {
+                    if (t.getCliente().getId() == c.getId()) {
+                        Format f = new SimpleDateFormat("yyyy-MM-dd");
+                        resultado += f.format(t.getFecha()) + "#";
+                    }
+
+                }
+            }
+        }
+
+        return resultado;
     }
 }
