@@ -3,11 +3,13 @@ package Controladores;
 import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.Turno;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class CEmpleado {
@@ -46,6 +48,10 @@ public class CEmpleado {
             }
             System.err.println("No se puedo encontrar el horario de atencion con id: " + id);
         }
+
+       /* if (horarioAtencion != null && horarioAtencion.getTurnos() != null) {
+            horarioAtencion.setTurnos(obtenerTurnosProximos(horarioAtencion));
+        }*/
         return horarioAtencion;
     }
 
@@ -53,9 +59,6 @@ public class CEmpleado {
         HorarioAtencion ha = obtenerHorarioAtencion(Long.valueOf(idHA));
         List<Turno> turnos = ha.getTurnos();
         String r = "ERR";
-
-
-        /*
 
         if (ha.getEstado().equals(EstadoTurno.PENDIENTE)) {
             if (!ha.getDia().equals(obtenerDiaActual())) {
@@ -89,7 +92,7 @@ public class CEmpleado {
             if ("ERR".equals(r)) {
                 r = "OK";
             }
-        }*/
+        }
         return r;
     }
 
@@ -134,37 +137,46 @@ public class CEmpleado {
         return diaString;
     }
 
-    public static void obtenerSiguienteDia(String dia) {
-        LocalDate ld = LocalDate.of(2018, 5, 21);
-
-         ld = ld.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
-       
-        switch (dia) {
+    public static List<Turno> obtenerTurnosProximos(HorarioAtencion ha) {
+        List<Turno> turnosProximos = new ArrayList<>();
+        LocalDate ld = LocalDate.now();
+        switch (ha.getDia()) {
             case "Lunes":
-
+                ld = ld.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
                 break;
             case "Martes":
-
+                ld = ld.with(TemporalAdjusters.nextOrSame(DayOfWeek.TUESDAY));
                 break;
             case "Miercoles":
-
+                ld = ld.with(TemporalAdjusters.nextOrSame(DayOfWeek.WEDNESDAY));
                 break;
             case "Jueves":
-
+                ld = ld.with(TemporalAdjusters.nextOrSame(DayOfWeek.THURSDAY));
                 break;
             case "Viernes":
-
+                ld = ld.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
                 break;
             case "Sabado":
-
+                ld = ld.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
                 break;
             case "Domingo":
-
+                ld = ld.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
                 break;
             default:
 
                 break;
         }
+
+        for (Turno t : ha.getTurnos()) {
+            Date dt = new Date(ld.getYear(), ld.getMonthValue(), ld.getDayOfMonth());
+            System.out.println(new SimpleDateFormat("yyyy/MM/dd").format(dt));
+            if ((new SimpleDateFormat("yyyy-mm-dd").format(new Date(ld.getYear(), ld.getMonthValue(), ld.getDayOfMonth()))).equals(t.getFecha().toString())) {
+                turnosProximos.add(t);
+                System.out.println("Controladores.CEmpleado.obtenerTurnosProximos() SON IGUALES");
+            }
+        }
+
+        return turnosProximos;
     }
 
 }

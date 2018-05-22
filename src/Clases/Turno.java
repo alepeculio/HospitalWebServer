@@ -46,6 +46,7 @@ public class Turno implements Serializable {
     public void setHora(Date hora) {
         this.hora = hora;
     }
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date fecha;
 
     public Date getFecha() {
