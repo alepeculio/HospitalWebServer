@@ -63,7 +63,7 @@ public class CHospital {
         return res;
     }
     
-    public static String obtenerFechasOcupadas (long idEmpleado, long idHospital, TipoTurno tipo) {
+    public static String obtenerFechasOcupadasJorge (long idEmpleado, long idHospital, TipoTurno tipo) {
         // dias guarda String: Nombre del dia, Integer: cantidad de horarios que tiene ese dia
         HashMap<String, Integer> dias = new HashMap<> ();
         // fechas guarda String: fecha#id_horario, Integer: cantidad de turnos vendidos para esa fecha en ese horario
