@@ -35,7 +35,7 @@ public class Turno implements Serializable {
     private TipoTurno tipo;
     private int numero;
     private EstadoTurno estado;
-    
+
     @Temporal(javax.persistence.TemporalType.TIME)
     private Date hora;
 
