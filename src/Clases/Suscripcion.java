@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Clases;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,19 +18,41 @@ public class Suscripcion implements Serializable {
     @ManyToOne
     private Hospital hospital;
 
+    @Expose
     @ManyToOne
     private Cliente cliente;
 
     private static final long serialVersionUID = 1L;
+    @Expose
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @Expose
     private int diaContratada;
+    @Expose
     private int mesContratada;
+    @Expose
     private int anioContratada;
+    @Expose
     private int diaVencimiento;
+    @Expose
     private int mesVencimiento;
+    @Expose
     private int anioVencimiento;
+    @Expose
+    private EstadoSuscripcion estado;
+
+    public Suscripcion() {
+        this.estado = EstadoSuscripcion.PENDIENTE;
+    }
+
+    public EstadoSuscripcion getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoSuscripcion estado) {
+        this.estado = estado;
+    }
 
     public Hospital getHospital() {
         return hospital;

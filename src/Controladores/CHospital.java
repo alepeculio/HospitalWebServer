@@ -6,6 +6,7 @@ import Clases.Empleado;
 import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.Hospital;
+import Clases.Suscripcion;
 import Clases.TipoTurno;
 import Clases.Turno;
 import Clases.Usuario;
@@ -16,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -337,5 +339,65 @@ public class CHospital {
 
         }
         return "";
+    }
+
+    public static List<Suscripcion> obtenerSuscripcionesbyUsuarioAdminHospital(Long idAdminHospital) {
+        Administrador admin = CAdministradores.getAdminByUsuario(idAdminHospital);
+        return admin.getHospital().getSuscripciones();
+    }
+
+    //Funca 
+    public static List<Date> obtenerFechasOcupadasAle(Hospital h, Long idEmpleado) {
+        List<Date> fechas = new ArrayList<>();
+        List<HorarioAtencion> hsa = h.getHorarioAtencions();
+        List<HorarioAtencion> hsaM = new ArrayList<>();
+        HashSet<Date> fechasUnicas = new HashSet<>();
+        HashSet<String> diasUnicos = new HashSet<>();
+        //Horarios de atencion del empleado recibido en ese hospital
+        for (HorarioAtencion ha : hsa) {
+            if (ha.getEmpleado().getId() == idEmpleado && ha.getTipo() == TipoTurno.ATENCION) {
+                hsaM.add(ha);
+            }
+        }
+
+        for (HorarioAtencion ha : hsaM) {
+            diasUnicos.add(ha.getDia());
+        }
+
+        for (HorarioAtencion ha : hsaM) {
+            int HAdia = 0;
+            int HAllenos = 0;
+            Date fechaADevolver = null;
+            for (String dia : diasUnicos) {
+                if (ha.getDia().equals(dia)) {
+                    HAdia++;
+                    List<Turno> turnos = ha.getTurnos();
+
+                    //Obtener todas las fechas distintas de los turnos
+                    for (Turno t : turnos) {
+                        fechasUnicas.add(t.getFecha());
+                    }
+
+                    //Por cada fecha ditinta checkear que, la cantidad de turnos en esa fecha sea igual la cantidad de clientes maxima del ha
+                    for (Date d : fechasUnicas) {
+                        int cTF = 0;
+                        for (Turno t : turnos) {
+                            if (t.getFecha().compareTo(d) == 0) {
+                                cTF++;
+                            }
+                        }
+                        if (cTF == ha.getClientesMax()) {
+                            HAllenos++;
+                            fechaADevolver = d;
+                        }
+                    }
+                }
+            }
+            if (HAllenos == HAdia) {
+                fechas.add(fechaADevolver);
+            }
+
+        }
+        return fechas;
     }
 }
