@@ -28,8 +28,79 @@ import javax.persistence.EntityManager;
  * @author Jorge
  */
 public class CHospital {
-
-    public static boolean eliminarHorarioAtencion(int id) {
+    
+    //TODO: Poner tildes
+    private static final String[] DIAS = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
+    
+    private static int opd (String dia) {
+        for (int i = 0; i < DIAS.length; i++)
+            if (DIAS[i].equals (dia))
+                return i;
+        return 0;
+    }
+    
+    public static String obtenerDiasNoDisponibles (long idEmpleado, long idHospital, TipoTurno tipo) {
+        List<HorarioAtencion> hs = CHospital.obtenerHorariosAtencion (idEmpleado, idHospital);
+        
+        String dias = "";
+        
+        for (HorarioAtencion h : hs)
+            if (h.getTipo () == tipo)
+                dias += h.getDia ();
+        
+        String res = "";
+        
+        for (String dia : DIAS)
+            if (!dias.contains (dia))
+                res += opd (dia) + ",";
+        
+        if (res.charAt (res.length () - 1) == ',')
+            res = res.substring (0, res.length () - 1);
+        
+        return res;
+    }
+    
+    public static String obtenerFechasOcupadas (long idEmpleado, long idHospital, TipoTurno tipo) {
+        List<Date> fechas = fechasOcupadas(idEmpleado, idHospital, tipo);
+        
+        String coso = "";
+        for (int i = 0; i < fechas.size (); i++)
+            coso += new SimpleDateFormat("YYYY-mmm-dd").format(fechas.get (i)) + (i != fechas.size () - 1 ? "#" : "");
+        return coso;
+    }
+    
+    private static List<Date> fechasOcupadas (long idEmpleado, long idHospital, TipoTurno tipo) {
+        List<Date> fechas = new ArrayList<>();
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        try {
+            fechas = (List<Date>) em.createNativeQuery ("SELECT DISTINCT t2.fecha"
+                    + "FROM horariosatencion AS ha2, turnos AS t2, cliente AS c2, hospital AS h2"
+                    + " WHERE t2.horarioAtencion_id = ha2.id AND ha2.empleado_id = c2.id AND ha.hospital_id = h2.id AND c2.id = :idEmp 	AND h2.id = :idHosp"
+                    + "	AND t2.fecha NOT IN ("
+                    + "		SELECT DISTINCT t.fecha"
+                    + "		FROM horariosatencion AS ha, turnos AS t, cliente AS c, hospital AS h"
+                    + "		WHERE t.horarioAtencion_id = ha.id AND ha.empleado_id = c.id AND ha.hospital_id = h.id AND c.id = :idEmp AND h.id = :idHosp"
+                    + "			AND ha.clientesMax != ("
+                    + "				SELECT COUNT(*)"
+                    + "				FROM turnos AS t2"
+                    + "				WHERE t2.horarioAtencion_id = ha.id"
+                    + "			);"
+                    + ");", Date.class)
+                    .setParameter ("idEmp", idEmpleado)
+                    .setParameter("idHosp", idHospital)
+                    .getResultList();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se eimino el horairo de atencion");
+        }
+        return fechas;
+    }
+    
+    public static boolean eliminarHorarioAtencion (int id) {
         EntityManager em = Singleton.getInstance().getEntity();
         em.getTransaction().begin();
         try {
@@ -45,11 +116,15 @@ public class CHospital {
         }
         return true;
     }
-
-    public static List<HorarioAtencion> obtenerHorariosAtencion(long idEmpleado, Usuario u) {
-        long idHospital = CAdministradores.getAdminByUsuario(u.getId()).getHospital().getId();
-
-        EntityManager em = Singleton.getInstance().getEntity();
+    
+    public static List<HorarioAtencion> obtenerHorariosAtencion (long idEmpleado, Usuario u) {
+        long idHospital = CAdministradores.getAdminByUsuario (u.getId ()).getHospital ().getId ();
+        return obtenerHorariosAtencion(idEmpleado, idHospital);
+    }
+    
+    
+    public static List<HorarioAtencion> obtenerHorariosAtencion (long idEmpleado, long idHospital) {
+        EntityManager em = Singleton.getInstance ().getEntity();
         em.getTransaction().begin();
         List<HorarioAtencion> lista = new ArrayList<>();
 
