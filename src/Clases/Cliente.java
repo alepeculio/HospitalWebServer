@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
+import java.util.HashMap;
 
 /**
  *

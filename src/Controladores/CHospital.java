@@ -10,6 +10,8 @@ import Clases.Cliente;
 import Clases.Empleado;
 import Clases.HorarioAtencion;
 import Clases.Hospital;
+import Clases.TipoTurno;
+import Clases.Turno;
 import Clases.Usuario;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,57 @@ import javax.persistence.EntityManager;
  * @author Jorge
  */
 public class CHospital {
+    
+    //TODO: Poner tildes
+    private static final String[] DIAS = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
+    
+    private static int opd (String dia) {
+        for (int i = 0; i < DIAS.length; i++)
+            if (DIAS[i].equals (dia))
+                return i;
+        return 0;
+    }
+    
+    public static String obtenerDiasNoDisponibles (long idEmpleado, long idHospital, TipoTurno tipo) {
+        List<HorarioAtencion> hs = CHospital.obtenerHorariosAtencion (idEmpleado, idHospital);
+        
+        String dias = "";
+        
+        for (HorarioAtencion h : hs)
+            if (h.getTipo () == tipo)
+                dias += h.getDia ();
+        
+        String res = "";
+        
+        for (String dia : DIAS)
+            if (!dias.contains (dia))
+                res += opd (dia) + ",";
+        
+        if (res.charAt (res.length () - 1) == ',')
+            res = res.substring (0, res.length () - 1);
+        
+        return res;
+    }
+    
+    public static String obtenerFechasOcupadas (long idEmpleado, long idHospital, TipoTurno tipo) {
+        List<HorarioAtencion> hs = CHospital.obtenerHorariosAtencion (idEmpleado, idHospital);
+        
+        String fechas = "";
+        
+        List<HorarioAtencion> hcompletos = new ArrayList<> ();
+        
+        for (HorarioAtencion h : hs) {
+        }
+        
+        List<String> res = new ArrayList<> ();
+        
+        
+        
+        String coso = "";
+        for (int i = 0; i < res.size (); i++)
+            coso += res.get (i) + (i != res.size () - 1 ? "#" : "");
+        return coso;
+    }
     
     public static boolean eliminarHorarioAtencion (int id) {
         EntityManager em = Singleton.getInstance().getEntity();
@@ -40,7 +93,11 @@ public class CHospital {
     
     public static List<HorarioAtencion> obtenerHorariosAtencion (long idEmpleado, Usuario u) {
         long idHospital = CAdministradores.getAdminByUsuario (u.getId ()).getHospital ().getId ();
-        
+        return obtenerHorariosAtencion(idEmpleado, idHospital);
+    }
+    
+    
+    public static List<HorarioAtencion> obtenerHorariosAtencion (long idEmpleado, long idHospital) {
         EntityManager em = Singleton.getInstance ().getEntity();
         em.getTransaction().begin();
         List<HorarioAtencion> lista = new ArrayList<>();

@@ -51,10 +51,8 @@ public class CCorreo {
             m.setSubject (asunto);
             m.setText(contenido);
             Transport.send(m);
-        } catch (MessagingException mex) {
-            mex.printStackTrace ();
-        } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace ();
+        } catch (Exception e) {
+            System.err.println("Ups, no se pudo mandar");
         }
     }
 }
