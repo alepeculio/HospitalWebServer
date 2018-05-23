@@ -22,6 +22,7 @@ import javax.persistence.OneToOne;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  *
@@ -79,6 +80,8 @@ public class Cliente implements Serializable {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
+
+
 
     public long getId() {
         return id;
@@ -214,6 +217,14 @@ public class Cliente implements Serializable {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public void agregarTurno(Turno h) {
+        if (turnos == null) {
+            turnos = new ArrayList<>();
+        }
+
+        turnos.add(h);
     }
 
     @Override

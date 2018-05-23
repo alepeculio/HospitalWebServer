@@ -15,6 +15,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -25,12 +27,15 @@ import javax.persistence.OneToOne;
 @Entity
 public class Hospital implements Serializable {
 
+    @ManyToOne
+    private Empleado empleado;
+
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
+
     @Column(unique = true)
     private String nombre;
     private boolean publico;
@@ -48,42 +53,53 @@ public class Hospital implements Serializable {
     private List<Administrador> administradores;
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorarioAtencion> horarioAtencions;
+    @ManyToMany
+    private List<Empleado> empleados;
+
+    public List<Empleado> getEmpleados() {
+        return empleados;
+    }
+
+    public void setEmpleados(List<Empleado> empleados) {
+        this.empleados = empleados;
+    }
 
     public List<HorarioAtencion> getHorarioAtencions() {
         return horarioAtencions;
     }
 
-    public List<Administrador> getAdministradores () {
+    public List<Administrador> getAdministradores() {
         return administradores;
     }
 
-    public void setAdministradores (List<Administrador> administradores) {
+    public void setAdministradores(List<Administrador> administradores) {
         this.administradores = administradores;
     }
-    
-    public void agregarAdministrador (Usuario u) {
-        if (administradores == null)
+
+    public void agregarAdministrador(Usuario u) {
+        if (administradores == null) {
             administradores = new ArrayList<>();
-        
-        Administrador a = new Administrador ();
-        a.setAdminGeneral (false);
-        a.setUsuario (u);
-        a.setHospital (this);
-        administradores.add (a);
+        }
+
+        Administrador a = new Administrador();
+        a.setAdminGeneral(false);
+        a.setUsuario(u);
+        a.setHospital(this);
+        administradores.add(a);
     }
-    
-    public void removerAdministrador (String ciAdmin) {
-        if (administradores == null)
+
+    public void removerAdministrador(String ciAdmin) {
+        if (administradores == null) {
             return;
-        
-        for (int i = 0; i < administradores.size (); i++)
-            if (administradores.get (i).getUsuario ().getCi ().equals (ciAdmin)) {
-                administradores.get (i).setHospital (null);
-                administradores.remove (i);
+        }
+        for (int i = 0; i < administradores.size(); i++) {
+            if (administradores.get(i).getUsuario().getCi().equals(ciAdmin)) {
+                administradores.get(i).setHospital(null);
+                administradores.remove(i);
                 return;
             }
+        }
     }
-    
 
     public void setHorarioAtencions(List<HorarioAtencion> horarioAtencions) {
         this.horarioAtencions = horarioAtencions;
@@ -96,7 +112,7 @@ public class Hospital implements Serializable {
     public String getDirectora() {
         return directora;
     }
-    
+
     public void agregarHA(HorarioAtencion ha) {
         if (horarioAtencions == null) {
             horarioAtencions = new ArrayList<>();
@@ -124,8 +140,6 @@ public class Hospital implements Serializable {
     public void setCorreo(String correo) {
         this.correo = correo;
     }
-    
-    
 
     public void setSuscripciones(List<Suscripcion> suscripciones) {
         this.suscripciones = suscripciones;
@@ -194,7 +208,7 @@ public class Hospital implements Serializable {
     public void setLongitud(double longitud) {
         this.longitud = longitud;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -219,5 +233,5 @@ public class Hospital implements Serializable {
     public String toString() {
         return "Logica.Hospital[ id=" + id + " ]";
     }
-    
+
 }
