@@ -15,10 +15,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -61,43 +64,126 @@ public class CHospital {
     }
     
     public static String obtenerFechasOcupadas (long idEmpleado, long idHospital, TipoTurno tipo) {
-        List<Date> fechas = fechasOcupadas(idEmpleado, idHospital, tipo);
+        // dias guarda String: Nombre del dia, Integer: cantidad de horarios que tiene ese dia
+        HashMap<String, Integer> dias = new HashMap<> ();
+        // fechas guarda String: fecha#id_horario, Integer: cantidad de turnos vendidos para esa fecha en ese horario
+        HashMap<String, Integer> fechas = new HashMap<> ();
         
+        List<HorarioAtencion> hs = obtenerHorariosAtencion (idEmpleado, idHospital);
+        
+        for (HorarioAtencion h : hs) {
+            // Si el tipo de horario no es del especificado no se cuenta
+            if (h.getTipo () != tipo)
+                continue;
+            
+            // Por cada "Lunes", "Martes", etc. voy guardando cuantos horarios de atencion tiene
+            if (dias.get (h.getDia ()) == null)
+                dias.put (h.getDia (), 1);
+            else
+                dias.put (h.getDia (), dias.get (h.getDia ()) + 1);
+            
+            // Si ese horario tiene algun turno ocupado
+            if (h.getTurnos () != null && h.getTurnos ().size () > 0) {
+                // Los recorro a todos y guardo por cada turno#id_horario cuantos tiene en el HashMap fechas
+                for (Turno t : h.getTurnos ()) {
+                    Date date = t.getFecha ();
+                    // Aca es el fecha#id_horario
+                    String turno_por_horario = new SimpleDateFormat ("YYYY-mm-dd").format (date) + "#" + h.getId ();
+
+                    if (dias.get (h.getDia ()) == null)
+                        fechas.put (turno_por_horario, 1);
+                    else
+                        fechas.put (turno_por_horario, fechas.get (turno_por_horario) + 1);
+                }
+            }
+        }
+        
+        // horariosOcupados guarda String: fecha, Integer: cantidad de horarios ocupados en esa fecha
+        HashMap<String, Integer> horariosOcupados = new HashMap<> ();
+        
+        // Recorro todos los pares fechas#id_horario
+        Iterator i = fechas.entrySet ().iterator ();
+        while (i.hasNext ()) {
+            // p: cada cosa en el HashMap (el p.getKey me da lo de la izq y el p.getValue lo de la der)
+            Map.Entry<String, Integer> p = (Map.Entry<String, Integer>) i.next();
+
+            // A la key la separo en la parte de la fecha y la parte del id_horario
+            String parteKeyFecha = p.getKey ().split ("#")[0];
+            int parteKeyIdHA = Integer.valueOf (p.getKey ().split ("#")[1]);
+            // Obtengo el horario de atencion
+            HorarioAtencion ha = null;
+            for (HorarioAtencion asdasf : hs)
+                if (asdasf.getId () == parteKeyIdHA)
+                    ha = asdasf;
+            // Si el valor de esa fecha (la cantidad de turnos vendidos es igual (o mayor por las dudas) a la cantidad max del turno entonces agrego uno al numero de horarios ocupados en esa fecha)
+            // IMPORTANTE: sumo 1 a la cantidad de horarios ocupados en esa fecha
+            if (ha != null && p.getValue () >= ha.getClientesMax ()) {
+                if (horariosOcupados.get (parteKeyFecha) == null)
+                    horariosOcupados.put (parteKeyFecha, 1);
+                else
+                    horariosOcupados.put (parteKeyFecha, horariosOcupados.get (parteKeyFecha) + 1);
+            }
+        }
+        
+        List<String> fechasOcupadas = new ArrayList<> ();
+        
+        // Recorro toda la lista de turnos ocupados
+        Iterator i2 = horariosOcupados.entrySet().iterator();
+        while (i2.hasNext()) {
+            // Recordatorio p: en String: fecha, Integer: horarios ocupados
+            Map.Entry<String, Integer> p = (Map.Entry<String, Integer>) i2.next();
+            
+            try {
+                // Obtengo el nombre del dia de esa fecha
+                String dia = obtenerDiaEspanol (new SimpleDateFormat ().parse (p.getKey ()));
+                
+                // Si la cantidad de horarios ocupados en esa fecha es igual a la cantidad de turnos en ese dia (Ver que contiene el HashMap dia mas arriba)
+                // Entonces significa que esa fecha en particular esta completamente vendida
+                if (dias.get (dia) != null && p.getValue () >= dias.get (dia)) {
+                    // Se agrega a las fechas ocupadas
+                    fechasOcupadas.add (p.getKey ());
+                }
+            } catch (ParseException ex) {
+                ex.printStackTrace ();
+            }
+        }
+        
+        // Se separan por # como el rompe huevo de Luis queria
         String coso = "";
-        for (int i = 0; i < fechas.size (); i++)
-            coso += new SimpleDateFormat("YYYY-mmm-dd").format(fechas.get (i)) + (i != fechas.size () - 1 ? "#" : "");
+        for (int j = 0; j < fechasOcupadas.size (); j++)
+            coso += new SimpleDateFormat("YYYY-mmm-dd").format(fechasOcupadas.get (j)) + (j != fechasOcupadas.size () - 1 ? "#" : "");
         return coso;
     }
     
-    private static List<Date> fechasOcupadas (long idEmpleado, long idHospital, TipoTurno tipo) {
-        List<Date> fechas = new ArrayList<>();
-        EntityManager em = Singleton.getInstance().getEntity();
-        em.getTransaction().begin();
-        try {
-            fechas = (List<Date>) em.createNativeQuery ("SELECT DISTINCT t2.fecha"
-                    + "FROM horariosatencion AS ha2, turnos AS t2, cliente AS c2, hospital AS h2"
-                    + " WHERE t2.horarioAtencion_id = ha2.id AND ha2.empleado_id = c2.id AND ha.hospital_id = h2.id AND c2.id = :idEmp 	AND h2.id = :idHosp"
-                    + "	AND t2.fecha NOT IN ("
-                    + "		SELECT DISTINCT t.fecha"
-                    + "		FROM horariosatencion AS ha, turnos AS t, cliente AS c, hospital AS h"
-                    + "		WHERE t.horarioAtencion_id = ha.id AND ha.empleado_id = c.id AND ha.hospital_id = h.id AND c.id = :idEmp AND h.id = :idHosp"
-                    + "			AND ha.clientesMax != ("
-                    + "				SELECT COUNT(*)"
-                    + "				FROM turnos AS t2"
-                    + "				WHERE t2.horarioAtencion_id = ha.id"
-                    + "			);"
-                    + ");", Date.class)
-                    .setParameter ("idEmp", idEmpleado)
-                    .setParameter("idHosp", idHospital)
-                    .getResultList();
-            em.getTransaction().commit();
-        } catch (Exception e) {
-            if (em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            System.out.println("No se eimino el horairo de atencion");
+    public static String obtenerDiaEspanol (Date d) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime (d);
+        int dia = cal.get (Calendar.DAY_OF_WEEK);
+        String diaString = "";
+        switch (dia) {
+            case Calendar.MONDAY:
+                diaString = "Lunes";
+                break;
+            case Calendar.TUESDAY:
+                diaString = "Martes";
+                break;
+            case Calendar.WEDNESDAY:
+                diaString = "Miercoles";
+                break;
+            case Calendar.THURSDAY:
+                diaString = "Jueves";
+                break;
+            case Calendar.FRIDAY:
+                diaString = "Viernes";
+                break;
+            case Calendar.SATURDAY:
+                diaString = "Sabado";
+                break;
+            case Calendar.SUNDAY:
+                diaString = "Domingo";
+                break;
         }
-        return fechas;
+        return diaString;
     }
     
     public static boolean eliminarHorarioAtencion (int id) {
