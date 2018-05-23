@@ -115,7 +115,10 @@ public class CCliente {
                     .getSingleResult();
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
-            Singleton.getInstance().getEntity().getTransaction().rollback();
+            if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
+                Singleton.getInstance().getEntity().getTransaction().rollback();
+            }
+
             System.err.println("No se puedo encontrar el cliente relacionado al usuario con id: " + idUsuario);
         }
         return cliente;

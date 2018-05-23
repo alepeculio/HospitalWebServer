@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -253,7 +254,7 @@ public class CHospital {
         return lista;
     }
 
-    public static String agregarTurno(String hospital, long idUsuario, String dia) {
+    public static String agregarTurno(String hospital, long idUsuario, String dia) throws ParseException {
         Hospital h = obtenerHospital(hospital);
         List<HorarioAtencion> ha = h.getHorarioAtencions();
         List<String> horarios = new ArrayList<>();
@@ -277,6 +278,11 @@ public class CHospital {
                 Cliente c = CCliente.getClientebyUsuario(idUsuario);
                 Turno t = new Turno();
                 String[] array = dia.split("-");
+                //
+                SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+                Date dd = formato.parse(dia);
+
+                //
                 Date d = new Date(Integer.valueOf(array[0]), Integer.valueOf(array[1]), Integer.valueOf(array[2]));
                 Format f = new SimpleDateFormat("MMMM");
                 String mes = f.format(d);
@@ -291,23 +297,23 @@ public class CHospital {
                     t.setEstado(EstadoTurno.PENDIENTE);
                     t.setHorarioAtencion(hs);
                     t.setNumero(1);
-                    t.setFecha(d);
+                    t.setFecha(dd);
                     t.setTipo(TipoTurno.ATENCION);
                     hs.agregarTurno(t);
                     c.agregarTurno(t);
                     //Singleton.getInstance().persist(t);
                     //Singleton.getInstance().merge(hs);
-                    //Singleton.getInstance().merge(c);
+                    //Singleton.getInstance().merge(c);         
 
                     return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + dateFormat.format(hs.getHoraInicio()) + "hs";
                 } else {
 
                     for (Turno ts : turnos) {
-                        if (ts.getCliente().getId() == c.getId() && ts.getFecha().compareTo(d) == 0 && hs.getTipo() == TipoTurno.ATENCION) {
+                        if (ts.getCliente().getId() == c.getId() && ts.getFecha().compareTo(dd) == 0 && hs.getTipo() == TipoTurno.ATENCION) {
                             return "Usted ya posee un turno para ese día.";
                         }
 
-                        if (ts.getFecha().compareTo(d) == 0) {
+                        if (ts.getFecha().compareTo(dd) == 0) {
                             turnosDia.add(ts);
                         }
                     }
@@ -325,7 +331,7 @@ public class CHospital {
                     t.setCliente(c);
                     t.setEstado(EstadoTurno.PENDIENTE);
                     t.setHorarioAtencion(hs);
-                    t.setFecha(d);
+                    t.setFecha(dd);
                     t.setNumero(turnosDia.size() + 1);
                     t.setTipo(TipoTurno.ATENCION);
                     hs.agregarTurno(t);
@@ -342,26 +348,41 @@ public class CHospital {
         return "";
     }
 
-    public static String ObtenerHorariosPedidos(String hospital, long idUsuario) {
+    public static String horariosOcupados(String hospital, long idUsuario) {
         Hospital h = obtenerHospital(hospital);
-        Cliente c = CCliente.getClientebyUsuario(idUsuario);
         List<HorarioAtencion> ha = h.getHorarioAtencions();
         String resultado = "";
 
+        HashMap<String, List<String>> fechas = new HashMap<>();
+
         for (HorarioAtencion hs : ha) {
-            if (hs.getTipo() == TipoTurno.ATENCION) {
+
+            if (hs.getTipo() == TipoTurno.ATENCION && hs.getEstado() == EstadoTurno.PENDIENTE && hs.getEmpleado().getId() == idUsuario) {
+
                 List<Turno> turnos = hs.getTurnos();
+                 List<Turno> semana ;
+                
 
                 for (Turno t : turnos) {
-                    if (t.getCliente().getId() == c.getId()) {
-                        Format f = new SimpleDateFormat("yyyy-MM-dd");
-                        resultado += f.format(t.getFecha()) + "#";
+
+                    if (t.getTipo() == TipoTurno.ATENCION) {
+
+                        if (turnos.size() == hs.getClientesMax()) {
+                            if (fechas.get("fecha") == null) {
+                                fechas.put("fecha", new ArrayList<String>());
+                            }
+
+                            DateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+                            fechas.get("fecha").add(formato.format(t.getFecha()));
+                        }
+
                     }
 
                 }
+
             }
         }
 
-        return resultado;
+        return "";
     }
 }
