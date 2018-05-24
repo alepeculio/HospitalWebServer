@@ -587,8 +587,7 @@ public class CHospital {
         Singleton.getInstance ().persist (s);
     }
     
-    
-    public static boolean tieneSuscripcionActiva (long idCli, long idHosp) {
+    public static Suscripcion tieneSuscripcion (long idCli, long idHosp, EstadoSuscripcion tipo) {
         EntityManager em = Singleton.getInstance().getEntity();
         em.getTransaction().begin();
         Suscripcion lista = null;
@@ -597,7 +596,7 @@ public class CHospital {
             lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp AND estado = :estado", Suscripcion.class)
                     .setParameter("idCli", idCli)
                     .setParameter("idHosp", idHosp)
-                    .setParameter("estado", EstadoSuscripcion.ACTIVA)
+                    .setParameter("estado", tipo)
                     .getSingleResult();
             em.getTransaction().commit();
         } catch (Exception e) {
@@ -606,6 +605,48 @@ public class CHospital {
             }
             System.out.println("No se encontraro la suscripcion");
         }
-        return lista != null;
+        return lista;
+    }
+    
+    public static Suscripcion obtenerEstadoDeSuscripcion (long idCli, long idHosp) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        List<Suscripcion> lista = null;
+
+        try {
+            lista = (List<Suscripcion>) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp", Suscripcion.class)
+                    .setParameter("idCli", idCli)
+                    .setParameter("idHosp", idHosp)
+                    .getResultList ();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se encontraro la suscripcion");
+        }
+        
+        if (lista == null || lista.size() == 0)
+            return null;
+        
+        if (suscripcionesContiene (lista, EstadoSuscripcion.ACTIVA) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.ACTIVA);
+        if (suscripcionesContiene (lista, EstadoSuscripcion.PENDIENTE) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.PENDIENTE);
+        if (suscripcionesContiene (lista, EstadoSuscripcion.VENCIDA) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.VENCIDA);
+        if (suscripcionesContiene (lista, EstadoSuscripcion.RECHAZADA) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.RECHAZADA);
+        if (suscripcionesContiene (lista, EstadoSuscripcion.ELIMINADA) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.ELIMINADA);
+        
+        return null;
+    }
+    
+    private static Suscripcion suscripcionesContiene (List<Suscripcion> sus, EstadoSuscripcion estado) {
+        for (Suscripcion s : sus)
+            if (s.getEstado () == estado)
+                return s;
+        return null;
     }
 }
