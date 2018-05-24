@@ -12,6 +12,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,10 +54,12 @@ public class Hospital implements Serializable {
     private List<Administrador> administradores;
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorarioAtencion> horarioAtencions;
-    @ManyToMany
+    @ManyToMany (cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Empleado> empleados;
 
     public List<Empleado> getEmpleados() {
+        if (empleados == null)
+            empleados = new ArrayList<>();
         return empleados;
     }
 

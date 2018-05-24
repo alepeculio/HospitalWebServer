@@ -1,15 +1,7 @@
 package Main;
 
-import Clases.Administrador;
-import Clases.Cliente;
-import Clases.Cliente;
-import Clases.HorarioAtencion;
-import Controladores.CAdministradores;
-import Controladores.CCliente;
 import Controladores.CHospital;
-import Controladores.Singleton;
-import java.util.Date;
-import java.util.List;
+
 
 /**
  *
@@ -18,8 +10,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-
-        Singleton.getInstance().getEntity().getTransaction();
+        CHospital.agregarSuscripcion(1, 1, 3);
     }
 
 }
