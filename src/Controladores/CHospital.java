@@ -538,7 +538,7 @@ public class CHospital {
         return admin.getHospital().getSuscripciones();
     }
     
-    public static void actualizarSuscripcion (long idSus, EstadoSuscripcion estado) {
+    public static boolean actualizarSuscripcion (long idSus, EstadoSuscripcion estado) {
         Suscripcion s = obtenerSuscripcion (idSus);
         s.setEstado (estado);
         if (estado == EstadoSuscripcion.ACTIVA) {
@@ -552,7 +552,7 @@ public class CHospital {
 
             s.setFechaVencimiento (cal.getTime ());
         }
-        Singleton.getInstance ().merge (s);
+        return Singleton.getInstance ().merge (s);
     }
     
     public static Suscripcion obtenerSuscripcion (long idSus) {
@@ -562,14 +562,14 @@ public class CHospital {
 
         try {
             lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE id = :idSus", Suscripcion.class)
-                    .setParameter("idEmpleado", idSus)
+                    .setParameter("idSus", idSus)
                     .getSingleResult();
             em.getTransaction().commit();
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            System.out.println("No se encontraro la suscripcion");
+            System.out.println("No se encontro la suscripcion");
         }
         return lista;
     }
