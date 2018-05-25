@@ -3,6 +3,7 @@ package Controladores;
 import Clases.Administrador;
 import Clases.Cliente;
 import Clases.Empleado;
+import Clases.EstadoSuscripcion;
 import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.Hospital;
@@ -15,9 +16,11 @@ import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,6 +30,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import sun.util.calendar.Gregorian;
 
 /**
  *
@@ -361,6 +365,19 @@ public class CHospital {
 
         return null;
     }
+    
+
+    public static Hospital obtenerHospital(long idHosp) {
+        List<Hospital> hospitales = obtenerHospitales();
+
+        for (Hospital h : hospitales) {
+            if (h.getId() == idHosp) {
+                return h;
+            }
+        }
+
+        return null;
+    }
 
     public static List<HorarioAtencion> obtenerHorariosHospital(long idHospital) {
         EntityManager em = Singleton.getInstance().getEntity();
@@ -528,59 +545,116 @@ public class CHospital {
         Administrador admin = CAdministradores.getAdminByUsuario(idAdminHospital);
         return admin.getHospital().getSuscripciones();
     }
+    
+    public static boolean actualizarSuscripcion (long idSus, EstadoSuscripcion estado) {
+        Suscripcion s = obtenerSuscripcion (idSus);
+        s.setEstado (estado);
+        if (estado == EstadoSuscripcion.ACTIVA) {
+            Date fechaC = new GregorianCalendar ().getTime ();
 
-    //Funca 
-    public static List<Date> obtenerFechasOcupadasAle(Hospital h, Long idEmpleado) {
-        List<Date> fechas = new ArrayList<>();
-        List<HorarioAtencion> hsa = h.getHorarioAtencions();
-        List<HorarioAtencion> hsaM = new ArrayList<>();
-        HashSet<Date> fechasUnicas = new HashSet<>();
-        HashSet<String> diasUnicos = new HashSet<>();
-        //Horarios de atencion del empleado recibido en ese hospital
-        for (HorarioAtencion ha : hsa) {
-            if (ha.getEmpleado().getId() == idEmpleado && ha.getTipo() == TipoTurno.ATENCION) {
-                hsaM.add(ha);
-            }
+            s.setFechaContratada (fechaC);
+
+            Calendar cal = Calendar.getInstance ();
+            cal.setTime (fechaC);
+            cal.add (Calendar.MONTH, s.getCantMeses ());
+
+            s.setFechaVencimiento (cal.getTime ());
         }
+        return Singleton.getInstance ().merge (s);
+    }
+    
+    public static Suscripcion obtenerSuscripcion (long idSus) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        Suscripcion lista = null;
 
-        for (HorarioAtencion ha : hsaM) {
-            diasUnicos.add(ha.getDia());
-        }
-
-        for (HorarioAtencion ha : hsaM) {
-            int HAdia = 0;
-            int HAllenos = 0;
-            Date fechaADevolver = null;
-            for (String dia : diasUnicos) {
-                if (ha.getDia().equals(dia)) {
-                    HAdia++;
-                    List<Turno> turnos = ha.getTurnos();
-
-                    //Obtener todas las fechas distintas de los turnos
-                    for (Turno t : turnos) {
-                        fechasUnicas.add(t.getFecha());
-                    }
-
-                    //Por cada fecha ditinta checkear que, la cantidad de turnos en esa fecha sea igual la cantidad de clientes maxima del ha
-                    for (Date d : fechasUnicas) {
-                        int cTF = 0;
-                        for (Turno t : turnos) {
-                            if (t.getFecha().compareTo(d) == 0) {
-                                cTF++;
-                            }
-                        }
-                        if (cTF == ha.getClientesMax()) {
-                            HAllenos++;
-                            fechaADevolver = d;
-                        }
-                    }
-                }
+        try {
+            lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE id = :idSus", Suscripcion.class)
+                    .setParameter("idSus", idSus)
+                    .getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
             }
-            if (HAllenos == HAdia) {
-                fechas.add(fechaADevolver);
-            }
-
+            System.out.println("No se encontro la suscripcion");
         }
-        return fechas;
+        return lista;
+    }
+    
+    public static void agregarSuscripcion (long idCli, long idHosp, int cantMeses) {
+        Suscripcion s = new Suscripcion ();
+        Cliente c = CCliente.getCliente (idCli);
+        Hospital h = CHospital.obtenerHospital (idHosp);
+        
+        s.setCliente (c);
+        s.setHospital (h);
+        s.setEstado (EstadoSuscripcion.PENDIENTE);
+        s.setCantMeses (cantMeses);
+        
+        Singleton.getInstance ().persist (s);
+    }
+    
+    public static Suscripcion tieneSuscripcion (long idCli, long idHosp, EstadoSuscripcion tipo) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        Suscripcion lista = null;
+
+        try {
+            lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp AND estado = :estado", Suscripcion.class)
+                    .setParameter("idCli", idCli)
+                    .setParameter("idHosp", idHosp)
+                    .setParameter("estado", tipo)
+                    .getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se encontraro la suscripcion");
+        }
+        return lista;
+    }
+    
+    public static Suscripcion obtenerEstadoDeSuscripcion (long idCli, long idHosp) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        List<Suscripcion> lista = null;
+
+        try {
+            lista = (List<Suscripcion>) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp", Suscripcion.class)
+                    .setParameter("idCli", idCli)
+                    .setParameter("idHosp", idHosp)
+                    .getResultList ();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se encontraro la suscripcion");
+        }
+        
+        if (lista == null || lista.size() == 0)
+            return null;
+        
+        if (suscripcionesContiene (lista, EstadoSuscripcion.ACTIVA) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.ACTIVA);
+        if (suscripcionesContiene (lista, EstadoSuscripcion.PENDIENTE) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.PENDIENTE);
+        if (suscripcionesContiene (lista, EstadoSuscripcion.VENCIDA) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.VENCIDA);
+        if (suscripcionesContiene (lista, EstadoSuscripcion.RECHAZADA) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.RECHAZADA);
+        if (suscripcionesContiene (lista, EstadoSuscripcion.ELIMINADA) != null)
+            return suscripcionesContiene (lista, EstadoSuscripcion.ELIMINADA);
+        
+        return null;
+    }
+    
+    private static Suscripcion suscripcionesContiene (List<Suscripcion> sus, EstadoSuscripcion estado) {
+        for (Suscripcion s : sus)
+            if (s.getEstado () == estado)
+                return s;
+        return null;
     }
 }
