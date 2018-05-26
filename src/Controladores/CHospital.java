@@ -494,7 +494,7 @@ public class CHospital {
                 t.setTipo(TipoTurno.ATENCION);
                 t.setEspecialidad(especialidad);
                 
-                if (turnos.isEmpty() || turnos == null) {
+                if (turnos.isEmpty()) {
                     t.setNumero(1);
                     t.setHora(ha.getHoraInicio());
                     ha.agregarTurno(t);
