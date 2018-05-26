@@ -54,12 +54,13 @@ public class Hospital implements Serializable {
     private List<Administrador> administradores;
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorarioAtencion> horarioAtencions;
-    @ManyToMany (cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Empleado> empleados;
 
     public List<Empleado> getEmpleados() {
-        if (empleados == null)
+        if (empleados == null) {
             empleados = new ArrayList<>();
+        }
         return empleados;
     }
 
@@ -210,6 +211,14 @@ public class Hospital implements Serializable {
 
     public void setLongitud(double longitud) {
         this.longitud = longitud;
+    }
+
+    public void agregarEmpleado(Empleado e) {
+        if (empleados == null) {
+            empleados = new ArrayList<>();
+        }
+
+        empleados.add(e);
     }
 
     @Override
