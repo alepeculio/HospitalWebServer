@@ -3,7 +3,7 @@ package Main;
 import Clases.Hospital;
 import Controladores.CHospital;
 import Controladores.Singleton;
-import java.text.ParseException;
+import java.util.Timer;
 
 /**
  *
@@ -11,8 +11,11 @@ import java.text.ParseException;
  */
 public class Main {
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws InterruptedException {
         Singleton.getInstance().getEntity().getTransaction();
+        Timer time = new Timer();
+        TareasProgramadas tp = new TareasProgramadas();
+        time.schedule(tp, 0, 10000);// cada 10seg
     }
 
 }

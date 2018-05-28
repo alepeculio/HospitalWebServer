@@ -478,7 +478,7 @@ public class CHospital {
 
         for (HorarioAtencion ha : horariosHospital) {
 
-            if (ha.getEmpleado().getId() == medico.getId() && ha.getDia().toLowerCase().equals(dayOfWeek) && ha.getTipo() == TipoTurno.ATENCION) {
+            if (ha.getEmpleado().getId() == medico.getId() && ha.getDia().toLowerCase().equals(dayOfWeek) && ha.getTipo() == TipoTurno.ATENCION && ha.getEstado() == EstadoTurno.PENDIENTE) {
 
                 List<Turno> turnos = ha.getTurnos();
 
@@ -494,6 +494,7 @@ public class CHospital {
                 t.setTipo(TipoTurno.ATENCION);
                 t.setEspecialidad(especialidad);
 
+                //email
                 if (turnos.isEmpty()) {
                     t.setNumero(1);
                     t.setHora(ha.getHoraInicio());
@@ -503,30 +504,35 @@ public class CHospital {
                     hora = dateFormat.format(ha.getHoraInicio());
                     Singleton.getInstance().persist(t);
 
+                    //preparar mail
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            CCorreo.enviar(c.getUsuario().getCorreo(), "Reserva", "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + dateFormat.format(ha.getHoraInicio()) + "hs");
+                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", especialidad, array[2], mes, array[0], hora, "Detalles de su reserva");
                         }
                     }).start();
 
-                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + dateFormat.format(ha.getHoraInicio()) + "hs";
+                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
                 } else {
 
                     /*Para sacar el numero del turno*/
                     for (Turno ts : turnos) {
 
+                        if (ts.getTipo() == TipoTurno.ATENCION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(dd) == 0 && ts.getEspecialidad().equals(especialidad)
+                                && ts.getCliente().getId() == c.getId()) {
+                            return "Usted ya solicitó un turno de atención con ese médico y especialidad";
+                        }
+
                         if (ts.getTipo() == TipoTurno.ATENCION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(dd) == 0) {
                             turnosDia.add(ts);
-
-                            for (int i = 0; i < ts.getHorarioAtencion().getClientesMax(); i++) {
-                                Date hi = ts.getHorarioAtencion().getHoraInicio();
-                                Date hf = ts.getHorarioAtencion().getHoraFin();
-                                Date hsss = Date.from(Instant.ofEpochMilli(hi.getTime() + ((hf.getTime() - hi.getTime()) / ts.getHorarioAtencion().getClientesMax()) * i));
-                                horarios.add(hsss);
-                            }
-
                         }
+                    }
+
+                    for (int i = 0; i < ha.getClientesMax(); i++) {
+                        Date hi = ha.getHoraInicio();
+                        Date hf = ha.getHoraFin();
+                        Date hsss = Date.from(Instant.ofEpochMilli(hi.getTime() + ((hf.getTime() - hi.getTime()) / ha.getClientesMax()) * i));
+                        horarios.add(hsss);
                     }
 
                     /*Para sacar la hora*/
@@ -535,12 +541,18 @@ public class CHospital {
                     ha.agregarTurno(t);
                     medico.agregarTurno(t);
                     c.agregarTurno(t);
+                    hora = dateFormat.format(t.getHora());
                     Singleton.getInstance().persist(t);
+
+                    //preparar email
+                    final String asunto = "Detalles de su reserva";
+
+                    final String contenido = "Sr/a " + c.getNombre() + " " + c.getApellido() + " " + "a continuación se adjuntan los detalles de su reserva:\n\n" + "Día: " + array[2] + " de " + mes + " del " + array[0] + "\n" + "Hora: " + dateFormat.format(t.getHora()) + "hs\n" + "Tipo: Atención\n" + "Médico: " + medico.getNombre() + " " + medico.getApellido() + "\n" + "Especialidad: " + t.getEspecialidad() + "\n" + "Hospital: " + h.getNombre() + "\n\n" + "Te esperamos, Hospital Web.";
 
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            CCorreo.enviar(c.getUsuario().getCorreo(), "Reserva", "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + dateFormat.format(t.getHora()) + "hs");
+                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", especialidad, array[2], mes, array[0], hora, "Detalles de su reserva");
                         }
                     }).start();
 
