@@ -59,19 +59,7 @@ public class TareasProgramadas extends TimerTask {
                             for (Turno t : turnos) {
 
                                 if (t.getFecha().compareTo(hoy) == 0 && t.getEstado() == EstadoTurno.PENDIENTE) {
-
-                                    DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-                                    DateFormat fechaFormat = new SimpleDateFormat("yyyy-MM-dd");
-                                    Format f = new SimpleDateFormat("MMMM");
-                                    String mes = f.format(t.getFecha());
-                                    String fecha = fechaFormat.format(t.getFecha());
-                                    String[] array = fecha.split("-");
-                                    String dia = array[2];
-                                    String anio = array[0];
-                                    String hora = dateFormat.format(t.getHora());
-                                    System.out.println("ENVIA CORREO");
-                                    CCorreo.enviarReserva(t.getCliente(), t.getHorarioAtencion().getEmpleado(), t.getHorarioAtencion().getHospital().getNombre(), t.getTipo() == TipoTurno.ATENCION ? "Atencíon" : "Vacunación", t.getEspecialidad(), dia, mes, anio, hora, "Recordatorio");
-                                    System.out.println("TERMINO DE ENVIAR");
+                                    CCorreo.enviarReserva(t.getCliente(), t.getHorarioAtencion().getEmpleado(), t.getHorarioAtencion().getHospital().getNombre(), t.getTipo() == TipoTurno.ATENCION ? "Atencíon" : "Vacunación", t, "Recordatorio");
                                 }
 
                             }

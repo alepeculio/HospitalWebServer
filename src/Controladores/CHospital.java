@@ -508,7 +508,7 @@ public class CHospital {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", especialidad, array[2], mes, array[0], hora, "Detalles de su reserva");
+                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", t, "Detalles de su reserva");
                         }
                     }).start();
 
@@ -552,7 +552,7 @@ public class CHospital {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", especialidad, array[2], mes, array[0], hora, "Detalles de su reserva");
+                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", t, "Detalles de su reserva");
                         }
                     }).start();
 
