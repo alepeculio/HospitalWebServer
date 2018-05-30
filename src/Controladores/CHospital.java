@@ -39,7 +39,7 @@ import sun.util.calendar.Gregorian;
 public class CHospital {
 
     //TODO: Poner tildes
-    private static final String[] DIAS = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
+    private static final String[] DIAS = {"Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"};
 
     private static int opd(String dia) {
         for (int i = 0; i < DIAS.length; i++) {

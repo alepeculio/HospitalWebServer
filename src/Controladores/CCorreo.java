@@ -32,7 +32,7 @@ public class CCorreo {
         enviar(c.getUsuario().getCorreo(), "Bienvenido a Hospital Web", "Hola " + c.getNombre() + " " + c.getApellido() + ",\n\nLe damos la bienvenida a Hospital Web y esperamos que disfrute de nuestro servicios.\n\nSu contraseña es: " + c.getUsuario().getContrasenia() + "\nLa misma se puede cambiar ingresando a la pagina.\n\nDisfrútalo.\n\nEl Equipo de HospitalWeb.");
     }
 
-    public static void enviarReserva(Cliente c, Empleado medico, String hospital, String tipoTurno, Turno t , String asunto) {
+    public static void enviarReserva(Cliente c, Empleado medico, String hospital, String tipoTurno, Turno t, String asunto) {
 
         String contenido;
 
@@ -45,12 +45,12 @@ public class CCorreo {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
         DateFormat fechaFormat = new SimpleDateFormat("yyyy-MM-dd");
         Format f = new SimpleDateFormat("MMMM");
-        String mes = f.format(t.getFecha()); //turno
-        String fecha = fechaFormat.format(t.getFecha()); //turno
-        String[] array = fecha.split("-"); //turno
-        String dia = array[2]; //turno
-        String anio = array[0]; //turno
-        String hora = dateFormat.format(t.getHora()); //turno
+        String mes = f.format(t.getFecha());
+        String fecha = fechaFormat.format(t.getFecha());
+        String[] array = fecha.split("-");
+        String dia = array[2];
+        String anio = array[0];
+        String hora = dateFormat.format(t.getHora());
 
         //String contenido = "Sr/a " + c.getNombre() + " " + c.getApellido() + " " + "a continuación se adjuntan los detalles de su reserva:\n\n";
         contenido += "Día: " + dia + " de " + mes + " del " + anio + "\n";
