@@ -446,6 +446,30 @@ public class CHospital {
         return lista;
     }
 
+    public static String obtenerHoras(long idEmpleado, String hospital) {
+        Hospital h = obtenerHospital(hospital);
+        Empleado medico = CUsuario.getEmpleado(idEmpleado);
+        List<HorarioAtencion> horarios = h.getHorarioAtencions();
+        String res = "";
+        if (!horarios.isEmpty()) {
+            for (HorarioAtencion hs : horarios) {
+                if (hs.getTipo() == TipoTurno.ATENCION && hs.getEmpleado().getId() == medico.getId() && hs.getEstado() == EstadoTurno.PENDIENTE) {
+
+                    DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+                    String horaInicio = dateFormat.format(hs.getHoraInicio());
+                    String horaFin = dateFormat.format(hs.getHoraFin());
+                    res += hs.getDia() + " : " + horaInicio + " - " + horaFin + "/";
+                }
+            }
+        }
+
+        if (res.charAt(res.length() - 1) == '/') {
+            res = res.substring(0, res.length() - 1);
+        }
+
+        return res;
+    }
+
     public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad) throws ParseException {
         Hospital h = obtenerHospital(hospital);
         Empleado medico = CUsuario.getEmpleado(ciEmpleado);
