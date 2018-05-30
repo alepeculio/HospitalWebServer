@@ -1,7 +1,5 @@
 package Main;
 
-import Clases.Hospital;
-import Controladores.CHospital;
 import Controladores.Singleton;
 import java.util.Timer;
 

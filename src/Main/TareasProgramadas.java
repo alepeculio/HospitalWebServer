@@ -5,6 +5,7 @@
  */
 package Main;
 
+import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.Hospital;
 import Clases.TipoTurno;
@@ -56,8 +57,8 @@ public class TareasProgramadas extends TimerTask {
                         if (!turnos.isEmpty()) {
 
                             for (Turno t : turnos) {
-                                System.out.println("no entra al if");
-                                if (t.getFecha().compareTo(hoy) == 0) {
+
+                                if (t.getFecha().compareTo(hoy) == 0 && t.getEstado() == EstadoTurno.PENDIENTE) {
 
                                     DateFormat dateFormat = new SimpleDateFormat("HH:mm");
                                     DateFormat fechaFormat = new SimpleDateFormat("yyyy-MM-dd");
