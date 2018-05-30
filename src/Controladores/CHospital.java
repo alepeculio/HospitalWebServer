@@ -470,7 +470,7 @@ public class CHospital {
         return res;
     }
 
-    public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad) throws ParseException {
+    public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad, String horario) throws ParseException {
         Hospital h = obtenerHospital(hospital);
         Empleado medico = CUsuario.getEmpleado(ciEmpleado);
         List<HorarioAtencion> horariosHospital = h.getHorarioAtencions();
@@ -500,14 +500,27 @@ public class CHospital {
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         Date dd = formato.parse(dia);
 
+        /* parseo el horario */
+        String[] partes = horario.split(" ");
+        String horarioInicio = partes[2];
+        String horarioFin = partes[4];
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+        /*
+        [0] = dia
+        [1] = :
+        [2] = hora inicio
+        [3] = -
+        [4] = hora fin
+         */
+
         for (HorarioAtencion ha : horariosHospital) {
 
-            if (ha.getEmpleado().getId() == medico.getId() && ha.getDia().toLowerCase().equals(dayOfWeek) && ha.getTipo() == TipoTurno.ATENCION && ha.getEstado() == EstadoTurno.PENDIENTE) {
+            if (ha.getEmpleado().getId() == medico.getId() && ha.getDia().toLowerCase().equals(dayOfWeek) && ha.getTipo() == TipoTurno.ATENCION && ha.getEstado() == EstadoTurno.PENDIENTE && dateFormat.format(ha.getHoraInicio()).equals(horarioInicio) && dateFormat.format(ha.getHoraFin()).equals(horarioFin)) {
 
                 List<Turno> turnos = ha.getTurnos();
 
                 Cliente c = CCliente.getClientebyUsuario(idUsuario);
-                DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+
                 String hora;
                 Turno t = new Turno();
 
@@ -568,11 +581,6 @@ public class CHospital {
                     hora = dateFormat.format(t.getHora());
                     Singleton.getInstance().persist(t);
 
-                    //preparar email
-                    final String asunto = "Detalles de su reserva";
-
-                    final String contenido = "Sr/a " + c.getNombre() + " " + c.getApellido() + " " + "a continuación se adjuntan los detalles de su reserva:\n\n" + "Día: " + array[2] + " de " + mes + " del " + array[0] + "\n" + "Hora: " + dateFormat.format(t.getHora()) + "hs\n" + "Tipo: Atención\n" + "Médico: " + medico.getNombre() + " " + medico.getApellido() + "\n" + "Especialidad: " + t.getEspecialidad() + "\n" + "Hospital: " + h.getNombre() + "\n\n" + "Te esperamos, Hospital Web.";
-
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -580,7 +588,7 @@ public class CHospital {
                         }
                     }).start();
 
-                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + dateFormat.format(t.getHora()) + "hs";
+                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
                 }
 
             }
