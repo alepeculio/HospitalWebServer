@@ -85,7 +85,12 @@ public class CEmpleado {
         HorarioAtencion ha = obtenerHorarioAtencion(Long.valueOf(idHA));
         List<Turno> turnos = ha.getTurnos();
         for (Turno turno : turnos) {
-            turno.setEstado(EstadoTurno.FINALIZADO);
+            if (turno.getEstado() == EstadoTurno.PENDIENTE) {
+                turno.setEstado(EstadoTurno.AUSENTE);
+            } else {
+                turno.setEstado(EstadoTurno.FINALIZADO);
+            }
+
         }
         ha.setTurnos(turnos);
         ha.setEstado(EstadoTurno.FINALIZADO);
