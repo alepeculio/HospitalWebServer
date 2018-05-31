@@ -64,6 +64,17 @@ public class Hospital implements Serializable {
         return empleados;
     }
 
+    public List<Empleado> getEmpleadosActivos() {
+        List<Empleado> emp = new ArrayList<>();
+        for (Empleado e : empleados) {
+            if (e.isActivo()) {
+                emp.add(e);
+            }
+        }
+
+        return emp;
+    }
+
     public void setEmpleados(List<Empleado> empleados) {
         this.empleados = empleados;
     }
