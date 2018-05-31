@@ -19,6 +19,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -470,6 +472,15 @@ public class CHospital {
         return res;
     }
 
+    public static int getOrden(List<Turno> turnos) {
+        for (int i = 0; i < turnos.size(); i++) {
+            if (turnos.get(i).getNumero() != turnos.get(i + 1).getNumero() - 1) {
+                return i + 1;
+            }
+        }
+        return 0;
+    }
+
     public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad, String horario) throws ParseException {
         Hospital h = obtenerHospital(hospital);
         Empleado medico = CUsuario.getEmpleado(ciEmpleado);
@@ -572,9 +583,28 @@ public class CHospital {
                         horarios.add(hsss);
                     }
 
-                    /*Para sacar la hora*/
-                    t.setNumero(turnosDia.size() + 1);
-                    t.setHora(horarios.get(turnosDia.size()));
+                    List<Turno> orden = turnos;
+
+                    Collections.sort(orden, new Comparator<Turno>() {
+                        public int compare(Turno t1, Turno t2) {
+                            return t1.getNumero() - t2.getNumero();
+                        }
+                    });
+
+                    if (orden.get(orden.size() - 1).getNumero() == orden.size()) {
+                        /*Para sacar la hora*/
+                        t.setNumero(turnosDia.size() + 1);
+                        t.setHora(horarios.get(turnosDia.size()));
+
+                    } else {
+
+                        int i = getOrden(orden);
+                        t.setNumero(i + 1);
+                        t.setHora(horarios.get(i));
+
+                        //setear
+                    }
+
                     ha.agregarTurno(t);
                     medico.agregarTurno(t);
                     c.agregarTurno(t);
@@ -589,6 +619,7 @@ public class CHospital {
                     }).start();
 
                     return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
+
                 }
 
             }
