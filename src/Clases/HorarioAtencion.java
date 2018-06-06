@@ -5,6 +5,7 @@
  */
 package Clases;
 
+import Controladores.Singleton;
 import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -54,6 +55,10 @@ public class HorarioAtencion implements Serializable {
     private int clientesMax;
     @Expose
     private int clienteActual;
+    @Expose
+    private boolean desactivado;
+    @Expose
+    private boolean eliminado;
 
     @Expose
     private EstadoTurno estado;
@@ -66,6 +71,35 @@ public class HorarioAtencion implements Serializable {
         this.tipo = tipo;
     }
 
+    public void eliminar () {
+        for (Turno t : turnos)
+            if (t.getEstado () != EstadoTurno.FINALIZADO) {
+                desactivado = true;
+                eliminado = false;
+                Singleton.getInstance ().merge (this);
+                return;
+            }
+        
+        desactivado = eliminado = true;
+        Singleton.getInstance ().merge (this);
+    }
+
+    public boolean isDesactivado() {
+        return desactivado;
+    }
+
+    public void setDesactivado(boolean desactivado) {
+        this.desactivado = desactivado;
+    }
+
+    public boolean isEliminado() {
+        return eliminado;
+    }
+
+    public void setEliminado(boolean eliminado) {
+        this.eliminado = eliminado;
+    }
+    
     public HorarioAtencion() {
         estado = EstadoTurno.PENDIENTE;
     }
