@@ -16,14 +16,14 @@ import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
-import sun.util.calendar.Gregorian;
 
 /**
  *
@@ -77,8 +76,7 @@ public class CHospital {
 
         return res;
     }
-
-    public static List<String> obtenerFechasOcupadasyo(long idEmpleado, long idHospital, TipoTurno tipo) {
+        public static List<String> obtenerFechasOcupadasyo(long idEmpleado, long idHospital, TipoTurno tipo) {
         List<HorarioAtencion> hs = obtenerHorariosAtencion(idEmpleado, idHospital);
         List<String> fechas = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
@@ -106,7 +104,6 @@ public class CHospital {
         }
         return fin;
     }
-
     public static String obtenerFechasOcupadasJorge(long idEmpleado, long idHospital, TipoTurno tipo) {
         // dias guarda String: Nombre del dia, Integer: cantidad de horarios que tiene ese dia
         HashMap<String, Integer> dias = new HashMap<>();
@@ -265,7 +262,7 @@ public class CHospital {
         List<HorarioAtencion> lista = new ArrayList<>();
 
         try {
-            lista = (List<HorarioAtencion>) em.createNativeQuery("SELECT ha.* FROM horarioatencion AS ha, cliente AS c, hospital AS h WHERE ha.empleado_id = c.id AND ha.hospital_id AND c.id = :idEmpleado AND h.id = :idHospital", HorarioAtencion.class)
+            lista = (List<HorarioAtencion>) em.createNativeQuery("SELECT ha.* FROM horarioatencion AS ha, cliente AS c, hospital AS h, hospital_cliente AS hc WHERE hc.hospital_id = h.id AND hc.empleados_id = c.id AND ha.empleado_id = c.id AND ha.hospital_id = h.id AND c.id = :idEmpleado AND h.id = :idHospital AND h.activado = 1", HorarioAtencion.class)
                     .setParameter("idEmpleado", idEmpleado)
                     .setParameter("idHospital", idHospital)
                     .getResultList();
@@ -381,7 +378,8 @@ public class CHospital {
         Hospital h = obtenerHospital(nombre);
 
         if (h != null) {
-            Singleton.getInstance().remove(h);
+            h.setActivado(false);
+            Singleton.getInstance().merge(h);
         }
     }
 
@@ -465,7 +463,7 @@ public class CHospital {
         }
 
         try {
-            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM hospital", Hospital.class).getResultList();
+            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM hospital WHERE activado = 1", Hospital.class).getResultList();
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
 
@@ -476,7 +474,6 @@ public class CHospital {
         }
         return lista;
     }
-
     public static String obtenerHoras(long idEmpleado, String hospital, TipoTurno turno) {
         Hospital h = obtenerHospital(hospital);
         Empleado medico = CUsuario.getEmpleado(idEmpleado);
@@ -503,6 +500,16 @@ public class CHospital {
         }
 
         return res;
+    }
+
+
+    public static int getOrden(List<Turno> turnos) {
+        for (int i = 0; i < turnos.size(); i++) {
+            if (turnos.get(i).getNumero() != turnos.get(i + 1).getNumero() - 1) {
+                return i + 1;
+            }
+        }
+        return 0;
     }
 
     public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad, String horario) throws ParseException {
@@ -607,9 +614,28 @@ public class CHospital {
                         horarios.add(hsss);
                     }
 
-                    /*Para sacar la hora*/
-                    t.setNumero(turnosDia.size() + 1);
-                    t.setHora(horarios.get(turnosDia.size()));
+                    List<Turno> orden = turnos;
+
+                    Collections.sort(orden, new Comparator<Turno>() {
+                        public int compare(Turno t1, Turno t2) {
+                            return t1.getNumero() - t2.getNumero();
+                        }
+                    });
+
+                    if (orden.get(orden.size() - 1).getNumero() == orden.size()) {
+                        /*Para sacar la hora*/
+                        t.setNumero(turnosDia.size() + 1);
+                        t.setHora(horarios.get(turnosDia.size()));
+
+                    } else {
+
+                        int i = getOrden(orden);
+                        t.setNumero(i + 1);
+                        t.setHora(horarios.get(i));
+
+                        //setear
+                    }
+
                     ha.agregarTurno(t);
                     medico.agregarTurno(t);
                     c.agregarTurno(t);
@@ -624,6 +650,7 @@ public class CHospital {
                     }).start();
 
                     return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
+
                 }
 
             }
@@ -755,5 +782,4 @@ public class CHospital {
         }
         return null;
     }
-
 }

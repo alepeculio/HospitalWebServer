@@ -1,27 +1,21 @@
 package Main;
 
-import Clases.Administrador;
-import Clases.Cliente;
-import Clases.Cliente;
-import Clases.HorarioAtencion;
-import Clases.TipoTurno;
-import Clases.Turno;
-import Controladores.CAdministradores;
-import Controladores.CCliente;
 import Controladores.CHospital;
 import Controladores.Singleton;
 import java.text.ParseException;
-import java.util.List;
 import java.util.Timer;
-
 
 /**
  *
  * @author Jorge
  */
 public class Main {
-    public static void main(String[] args) {
 
+    public static void main(String[] args) throws InterruptedException, ParseException {
+        Singleton.getInstance().getEntity().getTransaction();
+        Timer time = new Timer();
+        TareasProgramadas tp = new TareasProgramadas();
+        time.schedule(tp, 0, 10000);// cada 10seg
 
     }
 
