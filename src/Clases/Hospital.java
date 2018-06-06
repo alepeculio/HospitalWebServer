@@ -37,7 +37,6 @@ public class Hospital implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true)
     private String nombre;
     private boolean publico;
     private String departamento;
@@ -45,6 +44,7 @@ public class Hospital implements Serializable {
     private String directora;
     private String telefono;
     private String correo;
+    private boolean activado;
     private int numero;
     private double latitud;
     private double longitud;
@@ -160,6 +160,24 @@ public class Hospital implements Serializable {
         return id;
     }
 
+    public Empleado getEmpleado() {
+        return empleado;
+    }
+
+    public void setEmpleado(Empleado empleado) {
+        this.empleado = empleado;
+    }
+
+    public boolean isActivado() {
+        return activado;
+    }
+
+    public void setActivado(boolean activado) {
+        this.activado = activado;
+    }
+
+    
+    
     public void setId(Long id) {
         this.id = id;
     }

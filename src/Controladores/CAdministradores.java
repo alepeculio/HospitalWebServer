@@ -39,7 +39,7 @@ public class CAdministradores {
         Hospital h = null;
 
         try {
-            h = (Hospital) em.createNativeQuery("SELECT h.* FROM hospital AS h, administrador AS a, usuario AS u WHERE h.id = a.hospital_id AND a.usuario_id = u.id AND u.ci = :cedula", Hospital.class)
+            h = (Hospital) em.createNativeQuery("SELECT h.* FROM hospital AS h, administrador AS a, usuario AS u WHERE h.id = a.hospital_id AND a.usuario_id = u.id AND u.ci = :cedula AND h.activado = 1", Hospital.class)
                     .setParameter("cedula", ci)
                     .getSingleResult();
             em.getTransaction().commit();
