@@ -233,7 +233,7 @@ public class CHospital {
         List<HorarioAtencion> lista = new ArrayList<>();
 
         try {
-            lista = (List<HorarioAtencion>) em.createNativeQuery("SELECT ha.* FROM horarioatencion AS ha, cliente AS c, hospital AS h WHERE ha.empleado_id = c.id AND ha.hospital_id AND c.id = :idEmpleado AND h.id = :idHospital", HorarioAtencion.class)
+            lista = (List<HorarioAtencion>) em.createNativeQuery("SELECT ha.* FROM horarioatencion AS ha, cliente AS c, hospital AS h, hospital_cliente AS hc WHERE hc.hospital_id = h.id AND hc.empleados_id = c.id AND ha.empleado_id = c.id AND ha.hospital_id AND c.id = :idEmpleado AND h.id = :idHospital AND h.activado = 1", HorarioAtencion.class)
                     .setParameter("idEmpleado", idEmpleado)
                     .setParameter("idHospital", idHospital)
                     .getResultList();
@@ -349,7 +349,8 @@ public class CHospital {
         Hospital h = obtenerHospital(nombre);
 
         if (h != null) {
-            Singleton.getInstance().remove(h);
+            h.setActivado(false);
+            Singleton.getInstance().merge(h);
         }
     }
 
@@ -433,7 +434,7 @@ public class CHospital {
         }
 
         try {
-            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM hospital", Hospital.class).getResultList();
+            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM hospital WHERE activado = 1", Hospital.class).getResultList();
             Singleton.getInstance().getEntity().getTransaction().commit();
         } catch (Exception e) {
 
