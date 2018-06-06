@@ -248,6 +248,7 @@ public class Hospital implements Serializable {
         }
 
         empleados.add(e);
+        Singleton.getInstance().merge(this);
     }
 
     @Override
