@@ -462,10 +462,11 @@ public class CHospital {
             }
         }
 
-        if (res.charAt(res.length() - 1) == '/') {
-            res = res.substring(0, res.length() - 1);
+        if (!res.equals("")) {
+            if (res.charAt(res.length() - 1) == '/') {
+                res = res.substring(0, res.length() - 1);
+            }
         }
-
         return res;
     }
 
