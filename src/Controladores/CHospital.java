@@ -233,7 +233,7 @@ public class CHospital {
         List<HorarioAtencion> lista = new ArrayList<>();
 
         try {
-            lista = (List<HorarioAtencion>) em.createNativeQuery("SELECT ha.* FROM horarioatencion AS ha, cliente AS c, hospital AS h, hospital_cliente AS hc WHERE hc.hospital_id = h.id AND hc.empleados_id = c.id AND ha.empleado_id = c.id AND ha.hospital_id AND c.id = :idEmpleado AND h.id = :idHospital AND h.activado = 1", HorarioAtencion.class)
+            lista = (List<HorarioAtencion>) em.createNativeQuery("SELECT ha.* FROM horarioatencion AS ha, cliente AS c, hospital AS h, hospital_cliente AS hc WHERE hc.hospital_id = h.id AND hc.empleados_id = c.id AND ha.empleado_id = c.id AND ha.hospital_id = h.id AND c.id = :idEmpleado AND h.id = :idHospital AND h.activado = 1", HorarioAtencion.class)
                     .setParameter("idEmpleado", idEmpleado)
                     .setParameter("idHospital", idHospital)
                     .getResultList();
