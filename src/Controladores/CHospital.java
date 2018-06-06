@@ -455,7 +455,7 @@ public class CHospital {
         }
         return lista;
     }
-
+//Luis
     public static List<Hospital> obtenerHospitales() {
         List<Hospital> lista = null;
         if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
@@ -473,7 +473,7 @@ public class CHospital {
 
         }
         return lista;
-    }
+        }
     public static String obtenerHoras(long idEmpleado, String hospital, TipoTurno turno) {
         Hospital h = obtenerHospital(hospital);
         Empleado medico = CUsuario.getEmpleado(idEmpleado);
