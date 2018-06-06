@@ -171,6 +171,7 @@ public class CCliente {
         }
 
         List<Turno> turnos = CHospital.obtenerTurnosDeUnHorario(idHorario);
+
         Turno turno = new Turno();
         if (turnos.isEmpty()) {
             turno.setCliente(c);
@@ -213,8 +214,6 @@ public class CCliente {
     }
 
     public static List<Cliente> edad(Cliente c, int edad, String en) {
-        System.out.println("ok");
-
         List<Cliente> hijos = c.getHijos();
 
         List<Cliente> hijosXedad = new ArrayList<>();
