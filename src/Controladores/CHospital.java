@@ -531,7 +531,7 @@ public class CHospital {
         return 0;
     }
 
-    public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad, String horario) throws ParseException {
+    public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad, long idHorario) throws ParseException {
         Hospital h = obtenerHospital(hospital);
         Empleado medico = CUsuario.getEmpleado(ciEmpleado);
         List<HorarioAtencion> horariosHospital = h.getHorarioAtencions();
@@ -562,21 +562,11 @@ public class CHospital {
         Date dd = formato.parse(dia);
 
         /* parseo el horario */
-        String[] partes = horario.split(" ");
-        String horarioInicio = partes[2];
-        String horarioFin = partes[4];
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-        /*
-        [0] = dia
-        [1] = :
-        [2] = hora inicio
-        [3] = -
-        [4] = hora fin
-         */
 
         for (HorarioAtencion ha : horariosHospital) {
 
-            if (ha.getEmpleado().getId() == medico.getId() && ha.getDia().toLowerCase().equals(dayOfWeek) && ha.getTipo() == TipoTurno.ATENCION && ha.getEstado() == EstadoTurno.PENDIENTE && dateFormat.format(ha.getHoraInicio()).equals(horarioInicio) && dateFormat.format(ha.getHoraFin()).equals(horarioFin)) {
+            if (ha.getEmpleado().getId() == medico.getId() && ha.getDia().toLowerCase().equals(dayOfWeek) && ha.getTipo() == TipoTurno.ATENCION && ha.getEstado() == EstadoTurno.PENDIENTE && ha.getId() == idHorario) {
 
                 List<Turno> turnos = ha.getTurnos();
 
