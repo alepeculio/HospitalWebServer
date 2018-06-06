@@ -1,6 +1,5 @@
 package Main;
 
-import Controladores.CHospital;
 import Controladores.Singleton;
 import java.text.ParseException;
 import java.util.Timer;
