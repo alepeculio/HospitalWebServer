@@ -14,28 +14,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javafx.util.converter.LocalDateTimeStringConverter;
 
 public class CEmpleado {
 
-    /*
-    public static Turno obtenerTurno(long id) {
-        Turno turno = null;
-        try {
-            if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
-                Singleton.getInstance().getEntity().getTransaction().begin();
-            }
-            turno = (Turno) Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM turno WHERE id=" + id, Turno.class)
-                    .getSingleResult();
-            Singleton.getInstance().getEntity().getTransaction().commit();
-        } catch (Exception e) {
-            if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
-                Singleton.getInstance().getEntity().getTransaction().rollback();
-            }
-            System.err.println("No se puedo encontrar el turno con id: " + id);
-        }
-        return turno;
-    }
-     */
     public static HorarioAtencion obtenerHorarioAtencion(long id) {
         HorarioAtencion horarioAtencion = null;
         try {
@@ -103,7 +85,12 @@ public class CEmpleado {
         HorarioAtencion ha = obtenerHorarioAtencion(Long.valueOf(idHA));
         List<Turno> turnos = ha.getTurnos();
         for (Turno turno : turnos) {
-            turno.setEstado(EstadoTurno.FINALIZADO);
+            if (turno.getEstado() == EstadoTurno.PENDIENTE) {
+                turno.setEstado(EstadoTurno.AUSENTE);
+            } else {
+                turno.setEstado(EstadoTurno.FINALIZADO);
+            }
+
         }
         ha.setTurnos(turnos);
         ha.setEstado(EstadoTurno.FINALIZADO);
@@ -141,39 +128,50 @@ public class CEmpleado {
     }
 
     public static List<Turno> obtenerTurnosProximos(HorarioAtencion ha) {
+        List<Turno> turnos = ha.getTurnos();
         List<Turno> turnosProximos = new ArrayList<>();
-        LocalDate ldt = LocalDate.now();
-        switch (ha.getDia()) {
-            case "Lunes":
-                ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
-                break;
-            case "Martes":
-                ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.TUESDAY));
-                break;
-            case "Miercoles":
-                ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.WEDNESDAY));
-                break;
-            case "Jueves":
-                ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.THURSDAY));
-                break;
-            case "Viernes":
-                ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-                break;
-            case "Sabado":
-                ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
-                break;
-            case "Domingo":
-                ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-                break;
-            default:
 
-                break;
-        }
+        if (turnos != null) {
 
-        for (Turno t : ha.getTurnos()) {
-            LocalDate ld = new java.sql.Date(t.getFecha().getTime()).toLocalDate();
-            if (ldt.compareTo(ld) == 0) {
-                turnosProximos.add(t);
+            LocalDate ldt = LocalDate.now();
+            if (ldt.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                ha.setEstado(EstadoTurno.PENDIENTE);
+            } else {
+                ldt = ldt.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+            }
+
+            switch (ha.getDia()) {
+                case "Lunes":
+                    ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+                    break;
+                case "Martes":
+                    ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.TUESDAY));
+                    break;
+                case "Miercoles":
+                    ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.WEDNESDAY));
+                    break;
+                case "Jueves":
+                    ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.THURSDAY));
+                    break;
+                case "Viernes":
+                    ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+                    break;
+                case "Sabado":
+                    ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
+                    break;
+                case "Domingo":
+                    ldt = ldt.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+                    break;
+                default:
+
+                    break;
+            }
+
+            for (Turno t : turnos) {
+                LocalDate ld = new java.sql.Date(t.getFecha().getTime()).toLocalDate();
+                if (ldt.compareTo(ld) == 0) {
+                    turnosProximos.add(t);
+                }
             }
         }
 

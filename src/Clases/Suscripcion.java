@@ -2,6 +2,9 @@ package Clases;
 
 import com.google.gson.annotations.Expose;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,11 +18,11 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Suscripcion implements Serializable {
 
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.ALL)
     private Hospital hospital;
 
     @Expose
-    @ManyToOne
+    @ManyToOne (cascade = CascadeType.ALL)
     private Cliente cliente;
 
     private static final long serialVersionUID = 1L;
@@ -28,19 +31,13 @@ public class Suscripcion implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     @Expose
-    private int diaContratada;
+    private Date fechaContratada;
     @Expose
-    private int mesContratada;
-    @Expose
-    private int anioContratada;
-    @Expose
-    private int diaVencimiento;
-    @Expose
-    private int mesVencimiento;
-    @Expose
-    private int anioVencimiento;
+    private Date fechaVencimiento;
     @Expose
     private EstadoSuscripcion estado;
+    @Expose
+    private int cantMeses;
 
     public Suscripcion() {
         this.estado = EstadoSuscripcion.PENDIENTE;
@@ -70,53 +67,33 @@ public class Suscripcion implements Serializable {
         this.cliente = cliente;
     }
 
-    public int getDiaContratada() {
-        return diaContratada;
+    public int getCantMeses() {
+        return cantMeses;
     }
 
-    public void setDiaContratada(int diaContratada) {
-        this.diaContratada = diaContratada;
+    public void setCantMeses(int cantMeses) {
+        this.cantMeses = cantMeses;
+    }
+    
+    
+
+    public Date getFechaContratada() {
+        return fechaContratada;
     }
 
-    public int getMesContratada() {
-        return mesContratada;
+    public void setFechaContratada(Date fechaContratada) {
+        this.fechaContratada = fechaContratada;
     }
 
-    public void setMesContratada(int mesContratada) {
-        this.mesContratada = mesContratada;
+    public Date getFechaVencimiento() {
+        return fechaVencimiento;
     }
 
-    public int getAnioContratada() {
-        return anioContratada;
+    public void setFechaVencimiento(Date fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
     }
-
-    public void setAnioContratada(int anioContratada) {
-        this.anioContratada = anioContratada;
-    }
-
-    public int getDiaVencimiento() {
-        return diaVencimiento;
-    }
-
-    public void setDiaVencimiento(int diaVencimiento) {
-        this.diaVencimiento = diaVencimiento;
-    }
-
-    public int getMesVencimiento() {
-        return mesVencimiento;
-    }
-
-    public void setMesVencimiento(int mesVencimiento) {
-        this.mesVencimiento = mesVencimiento;
-    }
-
-    public int getAnioVencimiento() {
-        return anioVencimiento;
-    }
-
-    public void setAnioVencimiento(int anioVencimiento) {
-        this.anioVencimiento = anioVencimiento;
-    }
+    
+    
 
     public int getId() {
         return id;

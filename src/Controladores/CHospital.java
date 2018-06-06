@@ -3,6 +3,7 @@ package Controladores;
 import Clases.Administrador;
 import Clases.Cliente;
 import Clases.Empleado;
+import Clases.EstadoSuscripcion;
 import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.Hospital;
@@ -15,10 +16,12 @@ import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,6 +32,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
+import sun.util.calendar.Gregorian;
 
 /**
  *
@@ -37,7 +41,7 @@ import javax.persistence.EntityManager;
 public class CHospital {
 
     //TODO: Poner tildes
-    private static final String[] DIAS = {"Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"};
+    private static final String[] DIAS = {"Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"};
 
     private static int opd(String dia) {
         for (int i = 0; i < DIAS.length; i++) {
@@ -73,7 +77,7 @@ public class CHospital {
 
         return res;
     }
-    
+
     public static List<String> obtenerFechasOcupadasyo(long idEmpleado, long idHospital, TipoTurno tipo) {
         List<HorarioAtencion> hs = obtenerHorariosAtencion(idEmpleado, idHospital);
         List<String> fechas = new ArrayList<>();
@@ -393,6 +397,18 @@ public class CHospital {
         return null;
     }
 
+    public static Hospital obtenerHospital(long idHosp) {
+        List<Hospital> hospitales = obtenerHospitales();
+
+        for (Hospital h : hospitales) {
+            if (h.getId() == idHosp) {
+                return h;
+            }
+        }
+
+        return null;
+    }
+
     public static List<HorarioAtencion> obtenerHorariosHospital(long idHospital) {
         EntityManager em = Singleton.getInstance().getEntity();
         em.getTransaction().begin();
@@ -416,7 +432,7 @@ public class CHospital {
         List<HorarioAtencion> fin = new ArrayList<>();
 
         for (HorarioAtencion ha : Todos) {
-            if (ha.getClientesMax() > ha.getTurnos().size()) {
+            if (ha.getClientesMax() != ha.getTurnos().size()) {
                 fin.add(ha);
             }
 
@@ -444,7 +460,10 @@ public class CHospital {
 
     public static List<Hospital> obtenerHospitales() {
         List<Hospital> lista = null;
-        Singleton.getInstance().getEntity().getTransaction().begin();
+        if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
+            Singleton.getInstance().getEntity().getTransaction().begin();
+        }
+
         try {
             lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM hospital", Hospital.class).getResultList();
             Singleton.getInstance().getEntity().getTransaction().commit();
@@ -458,91 +477,156 @@ public class CHospital {
         return lista;
     }
 
-    public static String agregarTurno(String hospital, long idUsuario, String dia) {
+    public static String obtenerHoras(long idEmpleado, String hospital, TipoTurno turno) {
         Hospital h = obtenerHospital(hospital);
-        List<HorarioAtencion> ha = h.getHorarioAtencions();
-        List<String> horarios = new ArrayList<>();
+        Empleado medico = CUsuario.getEmpleado(idEmpleado);
+        List<HorarioAtencion> horarios = h.getHorarioAtencions();
+        String res = "";
+        if (!horarios.isEmpty()) {
+            for (HorarioAtencion hs : horarios) {
+                if (hs.getTipo() == turno && hs.getEmpleado().getId() == medico.getId() && hs.getEstado() == EstadoTurno.PENDIENTE) {
+
+                    DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+                    String horaInicio = dateFormat.format(hs.getHoraInicio());
+                    String horaFin = dateFormat.format(hs.getHoraFin());
+                    res += hs.getId() + "-" + hs.getDia() + "-" + horaInicio + "-" + horaFin + "/";
+                }
+            }
+        }
+
+        if (res.equals("")) {
+            res = "/";
+        }
+
+        if (res.charAt(res.length() - 1) == '/') {
+            res = res.substring(0, res.length() - 1);
+        }
+
+        return res;
+    }
+
+    public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad, String horario) throws ParseException {
+        Hospital h = obtenerHospital(hospital);
+        Empleado medico = CUsuario.getEmpleado(ciEmpleado);
+        List<HorarioAtencion> horariosHospital = h.getHorarioAtencions();
+        List<Date> horarios = new ArrayList<>();
         List<Turno> turnosDia = new ArrayList<>();
 
+        /*parsear el string de la fecha a date*/
         Date date = null;
         try {
             date = new SimpleDateFormat("yyyy-MM-dd").parse(dia);
         } catch (ParseException ex) {
             Logger.getLogger(CHospital.class.getName()).log(Level.SEVERE, null, ex);
         }
+        /* Termina de parsear la fecha*/
+
+ /* Parseo el dia a español */
         Locale spanishLocale = new Locale("es", "ES");
         String dayOfWeek = new SimpleDateFormat("EEEE", spanishLocale).format(date);
 
-        for (HorarioAtencion hs : ha) {
+        /* Termina el parseo del dia */
+        String[] array = dia.split("-");
+        Date d = new Date(Integer.valueOf(array[0]), Integer.valueOf(array[1]) - 1, Integer.valueOf(array[2]));
+        Format f = new SimpleDateFormat("MMMM");
+        String mes = f.format(d);
 
-            //aca estaban los horarios
-            if (hs.getDia().toLowerCase().equals(dayOfWeek)) {
+        /* parseo para el mensaje */
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+        Date dd = formato.parse(dia);
 
-                List<Turno> turnos = hs.getTurnos();
+        /* parseo el horario */
+        String[] partes = horario.split(" ");
+        String horarioInicio = partes[2];
+        String horarioFin = partes[4];
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+        /*
+        [0] = dia
+        [1] = :
+        [2] = hora inicio
+        [3] = -
+        [4] = hora fin
+         */
+
+        for (HorarioAtencion ha : horariosHospital) {
+
+            if (ha.getEmpleado().getId() == medico.getId() && ha.getDia().toLowerCase().equals(dayOfWeek) && ha.getTipo() == TipoTurno.ATENCION && ha.getEstado() == EstadoTurno.PENDIENTE && dateFormat.format(ha.getHoraInicio()).equals(horarioInicio) && dateFormat.format(ha.getHoraFin()).equals(horarioFin)) {
+
+                List<Turno> turnos = ha.getTurnos();
+
                 Cliente c = CCliente.getClientebyUsuario(idUsuario);
+
+                String hora;
                 Turno t = new Turno();
-                String[] array = dia.split("-");
-                Date d = new Date(Integer.valueOf(array[0]), Integer.valueOf(array[1]), Integer.valueOf(array[2]));
-                Format f = new SimpleDateFormat("MMMM");
-                String mes = f.format(d);
-                //para horarios
-                DateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
-                if (turnos.size() == hs.getClientesMax()) {
-                    return "NOPE";
-                } else if (turnos.isEmpty()) {
+                t.setCliente(c);
+                t.setEstado(EstadoTurno.PENDIENTE);
+                t.setHorarioAtencion(ha);
+                t.setFecha(dd);
+                t.setTipo(TipoTurno.ATENCION);
+                t.setEspecialidad(especialidad);
 
-                    t.setCliente(c);
-                    t.setEstado(EstadoTurno.PENDIENTE);
-                    t.setHorarioAtencion(hs);
+                //email
+                if (turnos.isEmpty()) {
                     t.setNumero(1);
-                    t.setFecha(d);
-                    t.setTipo(TipoTurno.ATENCION);
-                    hs.agregarTurno(t);
+                    t.setHora(ha.getHoraInicio());
+                    ha.agregarTurno(t);
+                    medico.agregarTurno(t);
                     c.agregarTurno(t);
-                    //Singleton.getInstance().persist(t);
-                    //Singleton.getInstance().merge(hs);
-                    //Singleton.getInstance().merge(c);
+                    hora = dateFormat.format(ha.getHoraInicio());
+                    Singleton.getInstance().persist(t);
 
-                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + dateFormat.format(hs.getHoraInicio()) + "hs";
+                    //preparar mail
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", t, "Detalles de su reserva");
+                        }
+                    }).start();
+
+                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
                 } else {
 
+                    /*Para sacar el numero del turno*/
                     for (Turno ts : turnos) {
-                        if (ts.getCliente().getId() == c.getId() && ts.getFecha().compareTo(d) == 0 && hs.getTipo() == TipoTurno.ATENCION) {
-                            return "Usted ya posee un turno para ese día.";
+
+                        if (ts.getTipo() == TipoTurno.ATENCION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(dd) == 0 && ts.getEspecialidad().equals(especialidad)
+                                && ts.getCliente().getId() == c.getId()) {
+                            return "Usted ya solicitó un turno de atención con ese médico y especialidad";
                         }
 
-                        if (ts.getFecha().compareTo(d) == 0) {
+                        if (ts.getTipo() == TipoTurno.ATENCION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(dd) == 0) {
                             turnosDia.add(ts);
                         }
                     }
 
-                    //obtener la hora del turno
-                    for (int i = 0; i < hs.getClientesMax(); i++) {
-                        Date hi = hs.getHoraInicio();
-                        Date hf = hs.getHoraFin();
-                        Date hsss = Date.from(Instant.ofEpochMilli(hi.getTime() + ((hf.getTime() - hi.getTime()) / hs.getClientesMax()) * i));
+                    for (int i = 0; i < ha.getClientesMax(); i++) {
+                        Date hi = ha.getHoraInicio();
+                        Date hf = ha.getHoraFin();
+                        Date hsss = Date.from(Instant.ofEpochMilli(hi.getTime() + ((hf.getTime() - hi.getTime()) / ha.getClientesMax()) * i));
+                        horarios.add(hsss);
+                    }
 
-                        horarios.add(dateFormat.format(hsss));
-
-                    }//fin de horarios
-
-                    t.setCliente(c);
-                    t.setEstado(EstadoTurno.PENDIENTE);
-                    t.setHorarioAtencion(hs);
-                    t.setFecha(d);
+                    /*Para sacar la hora*/
                     t.setNumero(turnosDia.size() + 1);
-                    t.setTipo(TipoTurno.ATENCION);
-                    hs.agregarTurno(t);
+                    t.setHora(horarios.get(turnosDia.size()));
+                    ha.agregarTurno(t);
+                    medico.agregarTurno(t);
                     c.agregarTurno(t);
-                    //Singleton.getInstance().persist(t);
-                    //Singleton.getInstance().merge(hs);
-                    //Singleton.getInstance().merge(c);
-                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + horarios.get(t.getNumero() - 1) + "hs";
+                    hora = dateFormat.format(t.getHora());
+                    Singleton.getInstance().persist(t);
 
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", t, "Detalles de su reserva");
+                        }
+                    }).start();
+
+                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
                 }
-            }
 
+            }
         }
         return "";
     }
@@ -550,6 +634,126 @@ public class CHospital {
     public static List<Suscripcion> obtenerSuscripcionesbyUsuarioAdminHospital(Long idAdminHospital) {
         Administrador admin = CAdministradores.getAdminByUsuario(idAdminHospital);
         return admin.getHospital().getSuscripciones();
+    }
+
+    public static boolean actualizarSuscripcion(long idSus, EstadoSuscripcion estado) {
+        Suscripcion s = obtenerSuscripcion(idSus);
+        s.setEstado(estado);
+        if (estado == EstadoSuscripcion.ACTIVA) {
+            Date fechaC = new GregorianCalendar().getTime();
+
+            s.setFechaContratada(fechaC);
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(fechaC);
+            cal.add(Calendar.MONTH, s.getCantMeses());
+
+            s.setFechaVencimiento(cal.getTime());
+        }
+        return Singleton.getInstance().merge(s);
+    }
+
+    public static Suscripcion obtenerSuscripcion(long idSus) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        Suscripcion lista = null;
+
+        try {
+            lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE id = :idSus", Suscripcion.class)
+                    .setParameter("idSus", idSus)
+                    .getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se encontro la suscripcion");
+        }
+        return lista;
+    }
+
+    public static void agregarSuscripcion(long idCli, long idHosp, int cantMeses) {
+        Suscripcion s = new Suscripcion();
+        Cliente c = CCliente.getCliente(idCli);
+        Hospital h = CHospital.obtenerHospital(idHosp);
+
+        s.setCliente(c);
+        s.setHospital(h);
+        s.setEstado(EstadoSuscripcion.PENDIENTE);
+        s.setCantMeses(cantMeses);
+
+        Singleton.getInstance().persist(s);
+    }
+
+    public static Suscripcion tieneSuscripcion(long idCli, long idHosp, EstadoSuscripcion tipo) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        Suscripcion lista = null;
+
+        try {
+            lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp AND estado = :estado", Suscripcion.class)
+                    .setParameter("idCli", idCli)
+                    .setParameter("idHosp", idHosp)
+                    .setParameter("estado", tipo)
+                    .getSingleResult();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se encontraro la suscripcion");
+        }
+        return lista;
+    }
+
+    public static Suscripcion obtenerEstadoDeSuscripcion(long idCli, long idHosp) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        List<Suscripcion> lista = null;
+
+        try {
+            lista = (List<Suscripcion>) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp", Suscripcion.class)
+                    .setParameter("idCli", idCli)
+                    .setParameter("idHosp", idHosp)
+                    .getResultList();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se encontraro la suscripcion");
+        }
+
+        if (lista == null || lista.size() == 0) {
+            return null;
+        }
+
+        if (suscripcionesContiene(lista, EstadoSuscripcion.ACTIVA) != null) {
+            return suscripcionesContiene(lista, EstadoSuscripcion.ACTIVA);
+        }
+        if (suscripcionesContiene(lista, EstadoSuscripcion.PENDIENTE) != null) {
+            return suscripcionesContiene(lista, EstadoSuscripcion.PENDIENTE);
+        }
+        if (suscripcionesContiene(lista, EstadoSuscripcion.VENCIDA) != null) {
+            return suscripcionesContiene(lista, EstadoSuscripcion.VENCIDA);
+        }
+        if (suscripcionesContiene(lista, EstadoSuscripcion.RECHAZADA) != null) {
+            return suscripcionesContiene(lista, EstadoSuscripcion.RECHAZADA);
+        }
+        if (suscripcionesContiene(lista, EstadoSuscripcion.ELIMINADA) != null) {
+            return suscripcionesContiene(lista, EstadoSuscripcion.ELIMINADA);
+        }
+
+        return null;
+    }
+
+    private static Suscripcion suscripcionesContiene(List<Suscripcion> sus, EstadoSuscripcion estado) {
+        for (Suscripcion s : sus) {
+            if (s.getEstado() == estado) {
+                return s;
+            }
+        }
+        return null;
     }
 
 }

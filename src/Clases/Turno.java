@@ -40,6 +40,15 @@ public class Turno implements Serializable {
 
     @Temporal(javax.persistence.TemporalType.TIME)
     private Date hora;
+    private String especialidad;
+
+    public String getEspecialidad() {
+        return especialidad;
+    }
+
+    public void setEspecialidad(String especialidad) {
+        this.especialidad = especialidad;
+    }
 
     public Date getHora() {
         return hora;

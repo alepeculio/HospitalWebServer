@@ -10,5 +10,5 @@ package Clases;
  * @author Ale
  */
 public enum EstadoTurno {
-    PENDIENTE, INICIADO, FINALIZADO
+    PENDIENTE, INICIADO, FINALIZADO,AUSENTE
 }
