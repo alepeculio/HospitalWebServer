@@ -8,6 +8,7 @@ package Controladores;
 import Clases.Administrador;
 import Clases.Cliente;
 import Clases.Empleado;
+import Clases.Hospital;
 import Clases.Usuario;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,21 +21,21 @@ import javax.persistence.EntityManager;
 public class CUsuario {
 
     Singleton s = Singleton.getInstance();
-    
-    public static boolean cambiarPass (long idUsuario, String nuevaPass) {
-        EntityManager em = Singleton.getInstance ().getEntity();
+
+    public static boolean cambiarPass(long idUsuario, String nuevaPass) {
+        EntityManager em = Singleton.getInstance().getEntity();
         em.getTransaction().begin();
         try {
             em.createNativeQuery("UPDATE usuario SET contrasenia = :contrasenia WHERE id = :id")
                     .setParameter("id", idUsuario)
                     .setParameter("contrasenia", nuevaPass)
-                    .executeUpdate ();
+                    .executeUpdate();
             em.getTransaction().commit();
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            e.printStackTrace ();
+            e.printStackTrace();
             System.out.println("No se pudo cambiar pass");
             return false;
         }
@@ -129,26 +130,23 @@ public class CUsuario {
         return empleado;
     }
 
-    public static List<Empleado> obtenerEmpleados() {
-        List<Empleado> lista = null;
+    public List<Empleado> obtenerEmpleados(long idHospital) {
+        EntityManager em = s.getEntity();
 
+        List<Empleado> empleados = null;
+        em.getTransaction().begin();
         try {
-            if (!Singleton.getInstance().getEntity().getTransaction().isActive()) {
-                Singleton.getInstance().getEntity().getTransaction().begin();
-            }
-            lista = Singleton.getInstance().getEntity().createNativeQuery("SELECT * FROM cliente WHERE DTYPE = 'Empleado' AND activo = 1", Empleado.class)
+            empleados = (List<Empleado>) em.createNativeQuery("SELECT * FROM cliente WHERE DTYPE = 'Empleado' AND activo = 1 AND id NOT IN(SELECT empleados_id FROM hospital_cliente WHERE Hospital_id ="+idHospital+") ", Empleado.class)
                     .getResultList();
-            Singleton.getInstance().getEntity().getTransaction().commit();
+            em.getTransaction().commit();
         } catch (Exception e) {
-            if (Singleton.getInstance().getEntity().getTransaction().isActive()) {
-                Singleton.getInstance().getEntity().getTransaction().rollback();
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
             }
+            e.printStackTrace();
+            System.err.println("No se pudo cargar los empleados");
         }
-
-        if (lista != null) {
-            return lista;
-        }
-        return new ArrayList<>();
+        return empleados;
     }
 
     public boolean bajaEmpleado(String idEmpleado) {
