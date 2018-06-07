@@ -188,8 +188,6 @@ public class Hospital implements Serializable {
         this.activado = activado;
     }
 
-    
-    
     public void setId(Long id) {
         this.id = id;
     }
@@ -248,6 +246,16 @@ public class Hospital implements Serializable {
         }
 
         empleados.add(e);
+    }
+
+    public HorarioAtencion obtenerHorarioById(long idHorario) {
+        for (HorarioAtencion hs : horarioAtencions) {
+            if (hs.getId() == idHorario) {
+                return hs;
+            }
+        }
+
+        return null;
     }
 
     @Override

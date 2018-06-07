@@ -76,7 +76,8 @@ public class CHospital {
 
         return res;
     }
-        public static List<String> obtenerFechasOcupadasyo(long idEmpleado, long idHospital, TipoTurno tipo) {
+
+    public static List<String> obtenerFechasOcupadasyo(long idEmpleado, long idHospital, TipoTurno tipo) {
         List<HorarioAtencion> hs = obtenerHorariosAtencion(idEmpleado, idHospital);
         List<String> fechas = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
@@ -104,6 +105,7 @@ public class CHospital {
         }
         return fin;
     }
+
     public static String obtenerFechasOcupadasJorge(long idEmpleado, long idHospital, TipoTurno tipo) {
         // dias guarda String: Nombre del dia, Integer: cantidad de horarios que tiene ese dia
         HashMap<String, Integer> dias = new HashMap<>();
@@ -474,6 +476,7 @@ public class CHospital {
         }
         return lista;
     }
+
     public static String obtenerHoras(long idEmpleado, String hospital, TipoTurno turno) {
         Hospital h = obtenerHospital(hospital);
         Empleado medico = CUsuario.getEmpleado(idEmpleado);
@@ -502,7 +505,6 @@ public class CHospital {
         return res;
     }
 
-
     public static int getOrden(List<Turno> turnos) {
         for (int i = 0; i < turnos.size(); i++) {
             if (turnos.get(i).getNumero() != turnos.get(i + 1).getNumero() - 1) {
@@ -512,14 +514,10 @@ public class CHospital {
         return 0;
     }
 
-    //asdasda
-    
-    
-    
-    public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad, String horario) throws ParseException {
+    public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad, long idHorario) throws ParseException {
         Hospital h = obtenerHospital(hospital);
         Empleado medico = CUsuario.getEmpleado(ciEmpleado);
-        List<HorarioAtencion> horariosHospital = h.getHorarioAtencions();
+        HorarioAtencion ha = h.obtenerHorarioById(idHorario);
         List<Date> horarios = new ArrayList<>();
         List<Turno> turnosDia = new ArrayList<>();
 
@@ -545,121 +543,108 @@ public class CHospital {
         /* parseo para el mensaje */
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
         Date dd = formato.parse(dia);
-
-        /* parseo el horario */
-        String[] partes = horario.split(" ");
-        String horarioInicio = partes[2];
-        String horarioFin = partes[4];
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-        /*
-        [0] = dia
-        [1] = :
-        [2] = hora inicio
-        [3] = -
-        [4] = hora fin
-         */
 
-        for (HorarioAtencion ha : horariosHospital) {
+        List<Turno> turnos = ha.getTurnos();
 
-            if (ha.getEmpleado().getId() == medico.getId() && ha.getDia().toLowerCase().equals(dayOfWeek) && ha.getTipo() == TipoTurno.ATENCION && ha.getEstado() == EstadoTurno.PENDIENTE && dateFormat.format(ha.getHoraInicio()).equals(horarioInicio) && dateFormat.format(ha.getHoraFin()).equals(horarioFin)) {
+        Cliente c = CCliente.getClientebyUsuario(idUsuario);
 
-                List<Turno> turnos = ha.getTurnos();
+        String hora;
+        Turno t = new Turno();
 
-                Cliente c = CCliente.getClientebyUsuario(idUsuario);
+        t.setCliente(c);
+        t.setEstado(EstadoTurno.PENDIENTE);
+        t.setHorarioAtencion(ha);
+        t.setFecha(dd);
+        t.setTipo(TipoTurno.ATENCION);
+        t.setEspecialidad(especialidad);
 
-                String hora;
-                Turno t = new Turno();
+        //email
+        if (turnos.isEmpty()) {
+            t.setNumero(1);
+            t.setHora(ha.getHoraInicio());
+            ha.agregarTurno(t);
+            medico.agregarTurno(t);
+            c.agregarTurno(t);
+            hora = dateFormat.format(ha.getHoraInicio());
+            Singleton.getInstance().persist(t);
 
-                t.setCliente(c);
-                t.setEstado(EstadoTurno.PENDIENTE);
-                t.setHorarioAtencion(ha);
-                t.setFecha(dd);
-                t.setTipo(TipoTurno.ATENCION);
-                t.setEspecialidad(especialidad);
+            //preparar mail
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", t, "Detalles de su reserva");
+                }
+            }).start();
 
-                //email
-                if (turnos.isEmpty()) {
-                    t.setNumero(1);
-                    t.setHora(ha.getHoraInicio());
-                    ha.agregarTurno(t);
-                    medico.agregarTurno(t);
-                    c.agregarTurno(t);
-                    hora = dateFormat.format(ha.getHoraInicio());
-                    Singleton.getInstance().persist(t);
+            return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
+        } else {
 
-                    //preparar mail
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", t, "Detalles de su reserva");
-                        }
-                    }).start();
+            /*Para sacar el numero del turno*/
+            for (Turno ts : turnos) {
 
-                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
-                } else {
-
-                    /*Para sacar el numero del turno*/
-                    for (Turno ts : turnos) {
-
-                        if (ts.getTipo() == TipoTurno.ATENCION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(dd) == 0 && ts.getEspecialidad().equals(especialidad)
-                                && ts.getCliente().getId() == c.getId()) {
-                            return "Usted ya solicitó un turno de atención con ese médico y especialidad";
-                        }
-
-                        if (ts.getTipo() == TipoTurno.ATENCION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(dd) == 0) {
-                            turnosDia.add(ts);
-                        }
-                    }
-
-                    for (int i = 0; i < ha.getClientesMax(); i++) {
-                        Date hi = ha.getHoraInicio();
-                        Date hf = ha.getHoraFin();
-                        Date hsss = Date.from(Instant.ofEpochMilli(hi.getTime() + ((hf.getTime() - hi.getTime()) / ha.getClientesMax()) * i));
-                        horarios.add(hsss);
-                    }
-
-                    List<Turno> orden = turnos;
-
-                    Collections.sort(orden, new Comparator<Turno>() {
-                        public int compare(Turno t1, Turno t2) {
-                            return t1.getNumero() - t2.getNumero();
-                        }
-                    });
-
-                    if (orden.get(orden.size() - 1).getNumero() == orden.size()) {
-                        /*Para sacar la hora*/
-                        t.setNumero(turnosDia.size() + 1);
-                        t.setHora(horarios.get(turnosDia.size()));
-
-                    } else {
-
-                        int i = getOrden(orden);
-                        t.setNumero(i + 1);
-                        t.setHora(horarios.get(i));
-
-                        //setear
-                    }
-
-                    ha.agregarTurno(t);
-                    medico.agregarTurno(t);
-                    c.agregarTurno(t);
-                    hora = dateFormat.format(t.getHora());
-                    Singleton.getInstance().persist(t);
-
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", t, "Detalles de su reserva");
-                        }
-                    }).start();
-
-                    return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
-
+                if (ts.getTipo() == TipoTurno.ATENCION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(dd) == 0 && ts.getEspecialidad().equals(especialidad)
+                        && ts.getCliente().getId() == c.getId()) {
+                    return "Usted ya solicitó un turno de atención con ese médico y especialidad";
                 }
 
+                if (ts.getTipo() == TipoTurno.ATENCION && ts.getEstado() == EstadoTurno.PENDIENTE && ts.getFecha().compareTo(dd) == 0) {
+                    turnosDia.add(ts);
+                }
             }
+
+            for (int i = 0; i < ha.getClientesMax(); i++) {
+                Date hi = ha.getHoraInicio();
+                Date hf = ha.getHoraFin();
+                Date hsss = Date.from(Instant.ofEpochMilli(hi.getTime() + ((hf.getTime() - hi.getTime()) / ha.getClientesMax()) * i));
+                horarios.add(hsss);
+            }
+
+            List<Turno> orden = turnos;
+
+            Collections.sort(orden, new Comparator<Turno>() {
+                public int compare(Turno t1, Turno t2) {
+                    return t1.getNumero() - t2.getNumero();
+                }
+            });
+
+            if (orden.get(orden.size() - 1).getNumero() == orden.size()) {
+                /*Para sacar la hora*/
+                t.setNumero(turnosDia.size() + 1);
+                t.setHora(horarios.get(turnosDia.size()));
+
+            } else {
+                if (orden.get(0).getNumero() != 1) {
+
+                    t.setNumero(1);
+                    t.setHora(horarios.get(0));
+
+                } else {
+                    int i = getOrden(orden);
+                    t.setNumero(i + 1);
+                    t.setHora(horarios.get(i));
+                }
+
+                //setear
+            }
+
+            ha.agregarTurno(t);
+            medico.agregarTurno(t);
+            c.agregarTurno(t);
+            hora = dateFormat.format(t.getHora());
+            Singleton.getInstance().persist(t);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    CCorreo.enviarReserva(c, medico, h.getNombre(), "Atención", t, "Detalles de su reserva");
+                }
+            }).start();
+
+            return "Su turno ha sido reservado para el día " + array[2] + " de " + mes + " del " + array[0] + " a las " + hora + "hs";
+
         }
-        return "";
+
     }
 
     public static List<Suscripcion> obtenerSuscripcionesbyUsuarioAdminHospital(Long idAdminHospital) {
@@ -690,7 +675,8 @@ public class CHospital {
         Suscripcion lista = null;
 
         try {
-            lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE id = :idSus", Suscripcion.class)
+            lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE id = :idSus", Suscripcion.class
+            )
                     .setParameter("idSus", idSus)
                     .getSingleResult();
             em.getTransaction().commit();
@@ -722,7 +708,8 @@ public class CHospital {
         Suscripcion lista = null;
 
         try {
-            lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp AND estado = :estado", Suscripcion.class)
+            lista = (Suscripcion) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp AND estado = :estado", Suscripcion.class
+            )
                     .setParameter("idCli", idCli)
                     .setParameter("idHosp", idHosp)
                     .setParameter("estado", tipo)
@@ -743,7 +730,8 @@ public class CHospital {
         List<Suscripcion> lista = null;
 
         try {
-            lista = (List<Suscripcion>) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp", Suscripcion.class)
+            lista = (List<Suscripcion>) em.createNativeQuery("SELECT * FROM suscripcion WHERE cliente_id = :idCli AND hospital_id = :idHosp", Suscripcion.class
+            )
                     .setParameter("idCli", idCli)
                     .setParameter("idHosp", idHosp)
                     .getResultList();
@@ -787,5 +775,3 @@ public class CHospital {
         return null;
     }
 }
-
-// Comentario Comentario
