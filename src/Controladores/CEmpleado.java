@@ -3,18 +3,14 @@ package Controladores;
 import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.Turno;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import javafx.util.converter.LocalDateTimeStringConverter;
+import javax.persistence.EntityManager;
 
 public class CEmpleado {
 
@@ -78,6 +74,11 @@ public class CEmpleado {
                 r = "OK";
             }
         }
+
+        if (ha.isDesactivado()) {
+            ha.eliminar();
+        }
+
         return r;
     }
 
@@ -95,6 +96,11 @@ public class CEmpleado {
         ha.setTurnos(turnos);
         ha.setEstado(EstadoTurno.FINALIZADO);
         ha.setClienteActual(0);
+
+        if (ha.isDesactivado()) {
+            ha.eliminar();
+        }
+
         return Singleton.getInstance().merge(ha);
     }
 
@@ -176,6 +182,23 @@ public class CEmpleado {
         }
 
         return turnosProximos;
+    }
+
+    public static boolean cancelarTurno(int id) {
+        EntityManager em = Singleton.getInstance().getEntity();
+        em.getTransaction().begin();
+        try {
+            em.createNativeQuery("DELETE FROM turno WHERE id = " + id)
+                    .executeUpdate();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.out.println("No se elimino el turno");
+            return false;
+        }
+        return true;
     }
 
 }

@@ -80,7 +80,7 @@ public class HorarioAtencion implements Serializable {
                 return;
             }
         
-        desactivado = eliminado = false;
+        desactivado = eliminado = true;
         Singleton.getInstance ().merge (this);
     }
 
