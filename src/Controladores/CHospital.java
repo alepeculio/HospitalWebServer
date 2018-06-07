@@ -512,6 +512,10 @@ public class CHospital {
         return 0;
     }
 
+    //asdasda
+    
+    
+    
     public static String agregarTurno(String hospital, long idUsuario, String dia, long ciEmpleado, String especialidad, String horario) throws ParseException {
         Hospital h = obtenerHospital(hospital);
         Empleado medico = CUsuario.getEmpleado(ciEmpleado);
