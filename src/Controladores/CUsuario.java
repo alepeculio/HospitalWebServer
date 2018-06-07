@@ -59,7 +59,7 @@ public class CUsuario {
 
         if (soloClientes != null) {
             for (Cliente c : soloClientes) {
-                if (c.getUsuario() == u) {
+                if (c.getUsuario().getId() == u.getId()) {
                     return "Cliente";
                 }
             }
