@@ -78,6 +78,10 @@ public class CEmpleado {
                 r = "OK";
             }
         }
+        
+        if (ha.isDesactivado())
+            ha.eliminar();
+        
         return r;
     }
 
@@ -95,6 +99,10 @@ public class CEmpleado {
         ha.setTurnos(turnos);
         ha.setEstado(EstadoTurno.FINALIZADO);
         ha.setClienteActual(0);
+        
+        if (ha.isDesactivado())
+            ha.eliminar();
+        
         return Singleton.getInstance().merge(ha);
     }
 
