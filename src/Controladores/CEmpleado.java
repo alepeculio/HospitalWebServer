@@ -3,18 +3,12 @@ package Controladores;
 import Clases.EstadoTurno;
 import Clases.HorarioAtencion;
 import Clases.Turno;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import javafx.util.converter.LocalDateTimeStringConverter;
 
 public class CEmpleado {
 
@@ -185,5 +179,4 @@ public class CEmpleado {
 
         return turnosProximos;
     }
-
 }
